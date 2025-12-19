@@ -4,15 +4,86 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>B & D Freight, Inc — Owner-Operator Partnerships</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 720px;
+      margin: 60px auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .notice {
+      background: #eee;
+      padding: 15px;
+      border-left: 4px solid #444;
+      margin-bottom: 30px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      margin: 15px 0;
+      font-size: 16px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 4px;
+      border: none;
+    }
+    .btn-primary {
+      background: #1f4ed8;
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #ccc;
+      color: #000;
+    }
+    .small {
+      font-size: 13px;
+      color: #666;
+      margin-top: 20px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; margin: 40px; max-width: 900px;">
-  <h1>B &amp; D Freight, Inc</h1>
-  <h2>Owner-Operator Partnerships</h2>
 
-  <p><strong>Owner-Operators only.</strong> We do not hire company drivers.</p>
+<body>
+  <div class="container">
+    <h1>B &amp; D Freight, Inc</h1>
+    <h2>Owner-Operator Partnerships</h2>
 
-  <p>Site launching soon. If you’re an owner-operator interested in dedicated freight and a disciplined lane planning approach, check back shortly.</p>
+    <div class="notice">
+      <strong>Important:</strong><br>
+      B &amp; D Freight partners exclusively with independent owner-operators.
+      We do <strong>not</strong> hire company drivers or W-2 employees.
+    </div>
 
-  <p><strong>Contact:</strong> (add your email/phone here when ready)</p>
+    <p>Please select the option that best describes you:</p>
+
+    <!-- Owner Operator -->
+    <button class="btn btn-primary"
+      onclick="window.location.href='apply.html';">
+      I am an Owner-Operator with my own truck
+    </button>
+
+    <!-- Company Driver -->
+    <button class="btn btn-secondary"
+      onclick="window.location.href='not-a-fit.html';">
+      I am a Company Driver
+    </button>
+
+    <p class="small">
+      This selection helps ensure we respect everyone’s time.
+    </p>
+  </div>
 </body>
 </html>
