@@ -1,1 +1,107 @@
-prequal.html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pre-Qualify — B & D Freight Partners</title>
+  <meta name="description" content="Fast owner-operator pre-qualification. Clear settlement terms explained up front." />
+  <style>
+    :root { --bg:#0b1220; --text:#e9eefc; --muted:#b8c4e6; --card:rgba(255,255,255,.05); --border:rgba(255,255,255,.10); --good:#a7f3d0; --bad:#fca5a5; --accent:#7dd3fc; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, var(--bg)); color:var(--text); }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 24px; }
+    .top a { color: var(--muted); text-decoration:none; font-weight:700; }
+    .hero { margin-top: 8px; }
+    h1 { margin: 10px 0 8px; font-size: clamp(26px, 4vw, 34px); }
+    p { color: var(--muted); line-height:1.5; margin: 8px 0; }
+    .card { background: var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; }
+    .q { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-top:1px solid rgba(255,255,255,.08); }
+    .q:first-of-type { border-top:0; }
+    .q label { font-weight:700; }
+    select { background: rgba(255,255,255,.06); color: var(--text); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:10px 12px; font-weight:800; min-width: 120px; }
+    .btn { appearance:none; border:0; border-radius:14px; padding:14px 16px; font-weight:900; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+    .btnPrimary { background: linear-gradient(90deg, var(--accent), var(--good)); color:#051018; width:100%; }
+    .btnGhost { background: rgba(255,255,255,.06); color:var(--text); border:1px solid rgba(255,255,255,.12); width:100%; margin-top:10px; }
+    .result { margin-top:14px; padding:14px; border-radius:16px; border:1px solid rgba(255,255,255,.12); }
+    .hide { display:none; }
+    a { color: var(--accent); }
+    .note { margin-top: 14px; font-size: 13px; }
+    .badge { display:inline-block; padding:6px 10px; border:1px solid rgba(255,255,255,.16); border-radius:999px; color:var(--muted); font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <a href="index.html">← Back</a>
+    </div>
+
+    <div class="hero">
+      <span class="badge">Owner-Operator Pre-Qual</span>
+      <h1>Pre-Qualify (60 seconds)</h1>
+      <p><strong>Clear settlement terms — explained up front.</strong> Answer honestly to help us respond faster.</p>
+    </div>
+
+    <div class="card">
+      <div class="q">
+        <label>Valid CDL-A?</label>
+        <select id="q1"><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+      <div class="q">
+        <label>2+ years driving experience?</label>
+        <select id="q2"><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+      <div class="q">
+        <label>Owner-operator with your own truck?</label>
+        <select id="q3"><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+      <div class="q">
+        <label>Willing to consent to MVR?</label>
+        <select id="q4"><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+      <div class="q">
+        <label>Can upload CDL + insurance documents?</label>
+        <select id="q5"><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+      <div class="q">
+        <label>Available to start within 7–14 days?</label>
+        <select id="q6"><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+
+      <button class="btn btnPrimary" id="checkBtn">Check Qualification →</button>
+      <a class="btn btnGhost" href="index.html">Back to Home</a>
+
+      <div id="pass" class="result hide" style="border-color: rgba(167,243,208,.35);">
+        <strong style="color:var(--good);">Qualified — continue to the application.</strong>
+        <p style="margin:8px 0 10px;">Next step: complete the Owner-Operator application form.</p>
+        <a class="btn btnPrimary" id="applyBtn" href="#" target="_blank" rel="noopener">Continue to Application →</a>
+        <p class="note">Have your CDL and insurance ready to upload.</p>
+      </div>
+
+      <div id="fail" class="result hide" style="border-color: rgba(252,165,165,.35);">
+        <strong style="color:var(--bad);">Not a fit right now.</strong>
+        <p style="margin:8px 0 0;">We partner exclusively with independent owner-operators. We do not hire company drivers or W-2 employees.</p>
+        <p style="margin:10px 0 0;"><a href="not-a-fit.html">See details →</a></p>
+      </div>
+    </div>
+
+    <p class="note">Note: Pre-qual helps us respond faster. Final qualification is confirmed during onboarding.</p>
+  </div>
+
+  <script>
+    // ✅ Replace this with your real Google Form link:
+    const GOOGLE_FORM_URL = "PASTE_YOUR_GOOGLE_FORM_LINK_HERE";
+
+    const qs = ["q1","q2","q3","q4","q5","q6"].map(id => document.getElementById(id));
+    const pass = document.getElementById("pass");
+    const fail = document.getElementById("fail");
+    const applyBtn = document.getElementById("applyBtn");
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      const allYes = qs.every(s => s.value === "yes");
+      pass.classList.toggle("hide", !allYes);
+      fail.classList.toggle("hide", allYes);
+      if (allYes) applyBtn.href = GOOGLE_FORM_URL;
+    });
+  </script>
+</body>
+</html>
+
