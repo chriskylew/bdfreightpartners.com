@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pre-Qualify — B & D Freight Partners</title>
   <meta name="description" content="Fast owner-operator pre-qualification. Clear settlement terms explained up front." />
+
+  <!-- ✅ Cloudflare Turnstile loader (leave as-is) -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
   <style>
     :root { --bg:#0b1220; --text:#e9eefc; --muted:#b8c4e6; --card:rgba(255,255,255,.05); --border:rgba(255,255,255,.10); --good:#a7f3d0; --bad:#fca5a5; --accent:#7dd3fc; }
     body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, var(--bg)); color:var(--text); }
@@ -27,7 +31,6 @@
     .note { margin-top: 14px; font-size: 13px; }
     .badge { display:inline-block; padding:6px 10px; border:1px solid rgba(255,255,255,.16); border-radius:999px; color:var(--muted); font-size:13px; }
   </style>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
   <div class="wrap">
@@ -67,6 +70,17 @@
         <select id="q6"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
+      <!-- ✅ Turnstile widget (paste your SITE KEY below) -->
+      <div id="tsWrap" style="margin:12px 0;">
+        <div
+          class="cf-turnstile"
+          data-sitekey="PASTE_YOUR_SITE_KEY_HERE"
+          data-callback="onTurnstileSuccess"
+          data-expired-callback="onTurnstileExpire"
+          data-error-callback="onTurnstileError"
+        ></div>
+      </div>
+
       <button class="btn btnPrimary" id="checkBtn">Check Qualification →</button>
       <a class="btn btnGhost" href="index.html">Back to Home</a>
 
@@ -88,15 +102,51 @@
   </div>
 
   <script>
-    // ✅ Replace this with your real Google Form link:
+    // ✅ Replace this with your real Google Form link (for now):
     const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc4UzgDkbMHqxTKFNG0USZfFMdxOUZURoC3P3OmPktIvVMOSA/viewform?usp=dialog";
 
     const qs = ["q1","q2","q3","q4","q5","q6"].map(id => document.getElementById(id));
     const pass = document.getElementById("pass");
     const fail = document.getElementById("fail");
     const applyBtn = document.getElementById("applyBtn");
+    const checkBtn = document.getElementById("checkBtn");
+
+    // Turnstile token (set after successful challenge)
+    let turnstileToken = "";
+
+    // Disable the button until Turnstile passes
+    checkBtn.disabled = true;
+    checkBtn.style.opacity = "0.6";
+    checkBtn.style.cursor = "not-allowed";
+
+    // Turnstile callbacks
+    window.onTurnstileSuccess = function(token) {
+      turnstileToken = token || "";
+      checkBtn.disabled = false;
+      checkBtn.style.opacity = "1";
+      checkBtn.style.cursor = "pointer";
+    };
+
+    window.onTurnstileExpire = function() {
+      turnstileToken = "";
+      checkBtn.disabled = true;
+      checkBtn.style.opacity = "0.6";
+      checkBtn.style.cursor = "not-allowed";
+    };
+
+    window.onTurnstileError = function() {
+      turnstileToken = "";
+      checkBtn.disabled = true;
+      checkBtn.style.opacity = "0.6";
+      checkBtn.style.cursor = "not-allowed";
+    };
 
     document.getElementById("checkBtn").addEventListener("click", () => {
+      if (!turnstileToken) {
+        alert("Please complete the anti-bot check first.");
+        return;
+      }
+
       const allYes = qs.every(s => s.value === "yes");
       pass.classList.toggle("hide", !allYes);
       fail.classList.toggle("hide", allYes);
