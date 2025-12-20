@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apply — B & D Freight Partners</title>
+  <meta name="description" content="Owner-Operator application. Fast intake with document-ready next steps." />
+  <style>
+    :root { --bg:#0b1220; --text:#e9eefc; --muted:#b8c4e6; --card:rgba(255,255,255,.05); --border:rgba(255,255,255,.10); --good:#a7f3d0; --accent:#7dd3fc; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, var(--bg)); color:var(--text); }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .top a { color: var(--muted); text-decoration:none; font-weight:700; }
+    h1 { margin: 10px 0 8px; font-size: clamp(26px, 4vw, 36px); }
+    p { color: var(--muted); line-height:1.5; margin: 8px 0; }
+    .card { background: var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 760px){ .grid { grid-template-columns: 1fr; } }
+    label { display:block; font-weight:800; margin: 10px 0 6px; }
+    input, textarea, select {
+      width: 100%;
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:12px;
+      padding:12px 12px;
+      font-weight:700;
+      outline: none;
+      box-sizing: border-box;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    .btn { appearance:none; border:0; border-radius:14px; padding:14px 16px; font-weight:900; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+    .btnPrimary { background: linear-gradient(90deg, var(--accent), var(--good)); color:#051018; width:100%; }
+    .btnGhost { background: rgba(255,255,255,.06); color:var(--text); border:1px solid rgba(255,255,255,.12); width:100%; margin-top:10px; }
+    .note { margin-top: 10px; font-size: 13px; }
+    .status { margin-top: 12px; padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12); }
+    .hide { display:none; }
+    .ok { border-color: rgba(167,243,208,.35); color: var(--good); }
+    .bad { border-color: rgba(252,165,165,.35); color: #fca5a5; }
+  </style>
+
+  <!-- Cloudflare Turnstile (front-end). You will paste your SITE KEY below. -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <a href="index.html">← Back</a>
+    </div>
+
+    <h1>Owner-Operator Application</h1>
+    <p>Fill this out and we’ll respond fast. Have your CDL + insurance ready for the next step.</p>
+
+    <div class="card">
+      <form id="applyForm">
+        <div class="grid">
+          <div>
+            <label for="contact_name">Full Name *</label>
+            <input id="contact_name" name="contact_name" required autocomplete="name" />
+          </div>
+          <div>
+            <label for="phone">Phone *</label>
+            <input id="phone" name="phone" required autocomplete="tel" />
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" />
+          </div>
+          <div>
+            <label for="home_zip">Home ZIP</label>
+            <input id="home_zip" name="home_zip" autocomplete="postal-code" />
+          </div>
+          <div>
+            <label for="equipment_type">Equipment Type</label>
+            <select id="equipment_type" name="equipment_type">
+              <option value="">— choose —</option>
+              <option>Dry Van</option>
+              <option>Reefer</option>
+              <option>Flatbed</option>
+              <option>Power Only</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="truck_count"># of Trucks</label>
+            <select id="truck_count" name="truck_count">
+              <option value="">— choose —</option>
+              <option>1</option>
+              <option>2–3</option>
+              <option>4–10</option>
+              <option>10+</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="preferred_regions">Preferred Regions / Lanes</label>
+        <textarea id="preferred_regions" name="preferred_regions" placeholder="Example: Midwest lanes, avoid Chicago, prefer 450–550 mile legs"></textarea>
+
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" placeholder="Anything we should know?"></textarea>
+
+        <!-- Turnstile widget -->
+        <!-- TODO: Replace YOUR_SITE_KEY_HERE with the Turnstile SITE KEY (public key) -->
+        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-theme="dark"></div>
+
+        <button class="btn btnPrimary" type="submit" id="submitBtn">Submit Application →</button>
+        <a class="btn btnGhost" href="index.html">Back to Home</a>
+
+        <div id="statusOk" class="status ok hide">Submitted. Redirecting…</div>
+        <div id="statusBad" class="status bad hide">Something went wrong. Please try again in a moment.</div>
+
+        <p class="note">Bot protection is enabled. If you don’t see the checkbox, refresh the page.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("applyForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const ok = document.getElementById("statusOk");
+    const bad = document.getElementById("statusBad");
+
+    function show(el){ el.classList.remove("hide"); }
+    function hide(el){ el.classList.add("hide"); }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hide(ok); hide(bad);
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting…";
+
+      try {
+        // Turnstile places its token into a hidden input named "cf-turnstile-response"
+        const token = (form.querySelector('input[name="cf-turnstile-response"]') || {}).value || "";
+        if (!token) throw new Error("Missing Turnstile token");
+
+        const payload = {
+          contact_name: form.contact_name.value.trim(),
+          phone: form.phone.value.trim(),
+          email: (form.email.value || "").trim(),
+          home_zip: (form.home_zip.value || "").trim(),
+          equipment_type: (form.equipment_type.value || "").trim(),
+          truck_count: (form.truck_count.value || "").trim(),
+          preferred_regions: (form.preferred_regions.value || "").trim(),
+          notes: (form.notes.value || "").trim(),
+          "cf-turnstile-response": token
+        };
+
+        const r = await fetch("/.netlify/functions/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok || !data.ok) throw new Error(data.error || "submit_failed");
+
+        show(ok);
+        setTimeout(() => { window.location.href = "thank-you.html"; }, 700);
+      } catch (err) {
+        console.error(err);
+        show(bad);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Application →";
+        // Optional: reset Turnstile so they can try again
+        try { if (window.turnstile) turnstile.reset(); } catch {}
+      }
+    });
+  </script>
+</body>
+</html>
