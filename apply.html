@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- VERSION: APPLY-DROPDOWNS-2025-12-21-2 -->
+<!-- VERSION: APPLY-DROPDOWNS-2025-12-21-3 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -42,14 +42,27 @@
     /* honeypot field hidden */
     .hp { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
 
-    /* ✅ DROPDOWN FIX: force native select rendering + arrow visibility */
+    /* ✅ Dropdowns: force native select rendering + make arrow obvious */
     select{
       appearance: auto;
       -webkit-appearance: menulist;
       -moz-appearance: menulist;
-      background-color: rgba(255,255,255,.10);
+      padding-right: 44px;
+      background-color: rgba(255,255,255,.12);
+      border-color: rgba(255,255,255,.22);
       cursor: pointer;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(233,238,252,.95) 50%),
+        linear-gradient(135deg, rgba(233,238,252,.95) 50%, transparent 50%);
+      background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 14px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
     }
+
+    /* Little helper line */
+    .micro { font-size:12px; color: rgba(184,196,230,.85); margin-top:6px; }
   </style>
 
   <!-- Cloudflare Turnstile -->
@@ -76,6 +89,9 @@
 
         <!-- Required for Netlify form capture -->
         <input type="hidden" name="form-name" value="oo-application" />
+
+        <!-- Timestamp field (anti-instant-submit bots) -->
+        <input type="hidden" id="page_ts" name="page_ts" value="" />
 
         <!-- Honeypot (spam trap) -->
         <p class="hp">
@@ -111,6 +127,7 @@
               <option>Power Only</option>
               <option>Other</option>
             </select>
+            <div class="micro">Tap to open options ▾</div>
           </div>
 
           <div>
@@ -122,6 +139,7 @@
               <option>4–10</option>
               <option>10+</option>
             </select>
+            <div class="micro">Tap to open options ▾</div>
           </div>
         </div>
 
@@ -154,9 +172,16 @@
     function show(el){ el.classList.remove("hide"); }
     function hide(el){ el.classList.add("hide"); }
 
-    // Light client-side throttle (doesn't stop bots completely, but reduces accidental repeats)
-    const THROTTLE_MS = 12000;
+    // Stamp load time (anti-instant-submit)
+    const pageLoadedAt = Date.now();
+    document.getElementById("page_ts").value = String(pageLoadedAt);
+
+    // Throttle repeats
+    const THROTTLE_MS = 20000;
     const key = "bd_apply_last_submit_ts";
+
+    // Minimum time on page before submit (helps block instant bots)
+    const MIN_TIME_ON_PAGE_MS = 2500;
 
     form.addEventListener("submit", (e) => {
       hide(bad);
@@ -176,9 +201,18 @@
         return;
       }
 
+      // Min time on page
+      const now = Date.now();
+      if (now - pageLoadedAt < MIN_TIME_ON_PAGE_MS) {
+        e.preventDefault();
+        hide(ok);
+        show(bad);
+        bad.textContent = "Please wait a moment, then submit again.";
+        return;
+      }
+
       // Throttle repeats
       const last = parseInt(localStorage.getItem(key) || "0", 10);
-      const now = Date.now();
       if (now - last < THROTTLE_MS) {
         e.preventDefault();
         hide(ok);
