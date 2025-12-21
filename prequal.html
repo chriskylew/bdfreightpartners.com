@@ -70,7 +70,7 @@
         <select id="q6"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
-      <!-- ✅ Turnstile widget (paste your SITE KEY below) -->
+      <!-- ✅ Turnstile widget -->
       <div id="tsWrap" style="margin:12px 0;">
         <div
           class="cf-turnstile"
@@ -87,8 +87,7 @@
       <div id="pass" class="result hide" style="border-color: rgba(167,243,208,.35);">
         <strong style="color:var(--good);">Qualified — continue to the application.</strong>
         <p style="margin:8px 0 10px;">Next step: complete the Owner-Operator application form.</p>
-        <a class="btn btnPrimary" id="applyBtn" href="#" target="_blank" rel="noopener">Continue to Application →</a>
-        <p class="note">Have your CDL and insurance ready to upload.</p>
+        <p class="note">Redirecting you to the application…</p>
       </div>
 
       <div id="fail" class="result hide" style="border-color: rgba(252,165,165,.35);">
@@ -102,12 +101,9 @@
   </div>
 
   <script>
-    // ✅ Replace this with your real Google Form link (for now):
-    if (allYes) window.location.href = "apply.html";
     const qs = ["q1","q2","q3","q4","q5","q6"].map(id => document.getElementById(id));
     const pass = document.getElementById("pass");
     const fail = document.getElementById("fail");
-    const applyBtn = document.getElementById("applyBtn");
     const checkBtn = document.getElementById("checkBtn");
 
     // Turnstile token (set after successful challenge)
@@ -140,7 +136,7 @@
       checkBtn.style.cursor = "not-allowed";
     };
 
-    document.getElementById("checkBtn").addEventListener("click", () => {
+    checkBtn.addEventListener("click", () => {
       if (!turnstileToken) {
         alert("Please complete the anti-bot check first.");
         return;
@@ -149,9 +145,12 @@
       const allYes = qs.every(s => s.value === "yes");
       pass.classList.toggle("hide", !allYes);
       fail.classList.toggle("hide", allYes);
-      if (allYes) applyBtn.href = GOOGLE_FORM_URL;
+
+      if (allYes) {
+        // ✅ Redirect immediately to the real application page
+        window.location.href = "apply.html";
+      }
     });
   </script>
 </body>
 </html>
-
