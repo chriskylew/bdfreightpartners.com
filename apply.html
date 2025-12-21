@@ -37,7 +37,6 @@
     .hide { display:none; }
     .ok { border-color: rgba(167,243,208,.35); color: var(--good); }
     .bad { border-color: rgba(252,165,165,.35); color: #fca5a5; }
-    .muted { color: var(--muted); }
 
     /* honeypot field hidden */
     .hp { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
@@ -57,24 +56,18 @@
     <p>Fill this out and we’ll respond fast. Have your CDL + insurance ready for the next step.</p>
 
     <div class="card">
-      <!--
-        Netlify Forms:
-        - data-netlify="true" is the key
-        - "netlify" attribute (no value) helps some setups detect forms
-        - data-netlify-redirect prevents POST-to-static-file 404s
-      -->
       <form id="applyForm"
             name="oo-application"
             method="POST"
             data-netlify="true"
             netlify
             data-netlify-honeypot="bot-field"
-            data-netlify-redirect="https://bdfreightpartners.com/thank-you.html">
+            data-netlify-redirect="/thank-you.html">
 
-        <!-- Required for Netlify to recognize the form -->
+        <!-- Required for Netlify form capture -->
         <input type="hidden" name="form-name" value="oo-application" />
 
-        <!-- Honeypot -->
+        <!-- Honeypot (spam trap) -->
         <p class="hp">
           <label>Don’t fill this out: <input name="bot-field" /></label>
         </p>
@@ -84,20 +77,15 @@
             <label for="contact_name">Full Name *</label>
             <input id="contact_name" name="contact_name" required autocomplete="name" />
           </div>
-
           <div>
             <label for="phone">Phone *</label>
-            <input id="phone" name="phone" required type="tel" autocomplete="tel"
-                   placeholder="555-555-5555"
-                   inputmode="tel" />
-            <div class="note muted">Use the best number to reach you today.</div>
+            <input id="phone" name="phone" required autocomplete="tel" inputmode="tel" placeholder="555-555-5555" />
           </div>
 
           <div>
             <label for="email">Email</label>
             <input id="email" name="email" type="email" autocomplete="email" placeholder="name@email.com" />
           </div>
-
           <div>
             <label for="home_zip">Home ZIP</label>
             <input id="home_zip" name="home_zip" autocomplete="postal-code" inputmode="numeric" />
@@ -156,42 +144,43 @@
     function show(el){ el.classList.remove("hide"); }
     function hide(el){ el.classList.add("hide"); }
 
-    // Light throttle (prevents accidental double submits)
+    // Light client-side throttle (doesn't stop bots completely, but reduces accidental repeats)
     const THROTTLE_MS = 12000;
     const key = "bd_apply_last_submit_ts";
 
     form.addEventListener("submit", (e) => {
       hide(bad);
+      show(ok);
 
       // Honeypot: if filled, block quietly
       const hp = (form.querySelector('input[name="bot-field"]') || {}).value || "";
-      if (hp.trim()) { e.preventDefault(); return; }
+      if (hp.trim()) { e.preventDefault(); hide(ok); return; }
 
       // Turnstile token must exist
       const token = (form.querySelector('input[name="cf-turnstile-response"]') || {}).value || "";
       if (!token) {
         e.preventDefault();
+        hide(ok);
         show(bad);
         try { if (window.turnstile) turnstile.reset(); } catch {}
         return;
       }
 
+      // Throttle repeats
       const last = parseInt(localStorage.getItem(key) || "0", 10);
       const now = Date.now();
       if (now - last < THROTTLE_MS) {
         e.preventDefault();
+        hide(ok);
         show(bad);
         bad.textContent = "Please wait a moment and try again.";
         return;
       }
       localStorage.setItem(key, String(now));
 
-      // UI lock + show status
-      show(ok);
       submitBtn.disabled = true;
       submitBtn.textContent = "Submitting…";
-
-      // Allow normal POST to Netlify Forms. Netlify handles redirect via data-netlify-redirect.
+      // Let the normal POST happen (Netlify Forms handles it)
     });
   </script>
 </body>
