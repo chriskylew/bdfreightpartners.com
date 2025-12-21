@@ -37,6 +37,7 @@
     .hide { display:none; }
     .ok { border-color: rgba(167,243,208,.35); color: var(--good); }
     .bad { border-color: rgba(252,165,165,.35); color: #fca5a5; }
+    .muted { color: var(--muted); }
 
     /* honeypot field hidden */
     .hp { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
@@ -56,11 +57,17 @@
     <p>Fill this out and we’ll respond fast. Have your CDL + insurance ready for the next step.</p>
 
     <div class="card">
+      <!--
+        Netlify Forms:
+        - data-netlify="true" is the key
+        - "netlify" attribute (no value) helps some setups detect forms
+      -->
       <form id="applyForm"
             name="oo-application"
             method="POST"
             action="/thank-you.html"
             data-netlify="true"
+            netlify
             data-netlify-honeypot="bot-field">
 
         <!-- Required for Netlify to recognize the form -->
@@ -76,18 +83,25 @@
             <label for="contact_name">Full Name *</label>
             <input id="contact_name" name="contact_name" required autocomplete="name" />
           </div>
+
           <div>
             <label for="phone">Phone *</label>
-            <input id="phone" name="phone" required autocomplete="tel" />
+            <input id="phone" name="phone" required type="tel" autocomplete="tel"
+                   placeholder="555-555-5555"
+                   inputmode="tel" />
+            <div class="note muted">Use the best number to reach you today.</div>
           </div>
+
           <div>
             <label for="email">Email</label>
-            <input id="email" name="email" type="email" autocomplete="email" />
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="name@email.com" />
           </div>
+
           <div>
             <label for="home_zip">Home ZIP</label>
-            <input id="home_zip" name="home_zip" autocomplete="postal-code" />
+            <input id="home_zip" name="home_zip" autocomplete="postal-code" inputmode="numeric" />
           </div>
+
           <div>
             <label for="equipment_type">Equipment Type</label>
             <select id="equipment_type" name="equipment_type">
@@ -99,6 +113,7 @@
               <option>Other</option>
             </select>
           </div>
+
           <div>
             <label for="truck_count"># of Trucks</label>
             <select id="truck_count" name="truck_count">
@@ -123,7 +138,7 @@
         <button class="btn btnPrimary" type="submit" id="submitBtn">Submit Application →</button>
         <a class="btn btnGhost" href="/index.html">Back to Home</a>
 
-        <div id="statusOk" class="status ok hide">Submitting…</div>
+        <div id="statusOk" class="status ok hide">Submitting… please wait.</div>
         <div id="statusBad" class="status bad hide">Please complete the anti-bot check and try again.</div>
 
         <p class="note">Bot protection is enabled. If you don’t see the widget, refresh the page.</p>
@@ -140,22 +155,21 @@
     function show(el){ el.classList.remove("hide"); }
     function hide(el){ el.classList.add("hide"); }
 
-    // light throttle
+    // Light throttle (prevents accidental double submits)
     const THROTTLE_MS = 12000;
     const key = "bd_apply_last_submit_ts";
 
     form.addEventListener("submit", (e) => {
-      hide(bad); show(ok);
+      hide(bad);
 
       // Honeypot: if filled, block quietly
       const hp = (form.querySelector('input[name="bot-field"]') || {}).value || "";
-      if (hp.trim()) { e.preventDefault(); hide(ok); return; }
+      if (hp.trim()) { e.preventDefault(); return; }
 
       // Turnstile token must exist
       const token = (form.querySelector('input[name="cf-turnstile-response"]') || {}).value || "";
       if (!token) {
         e.preventDefault();
-        hide(ok);
         show(bad);
         try { if (window.turnstile) turnstile.reset(); } catch {}
         return;
@@ -165,16 +179,18 @@
       const now = Date.now();
       if (now - last < THROTTLE_MS) {
         e.preventDefault();
-        hide(ok);
         show(bad);
         bad.textContent = "Please wait a moment and try again.";
         return;
       }
       localStorage.setItem(key, String(now));
 
+      // UI lock + show status
+      show(ok);
       submitBtn.disabled = true;
       submitBtn.textContent = "Submitting…";
-      // Allow normal POST to Netlify Forms
+
+      // Allow normal POST to Netlify Forms (action="/thank-you.html")
     });
   </script>
 </body>
