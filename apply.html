@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- VERSION: APPLY-DROPDOWNS-2025-12-21-3 -->
+<!-- VERSION: APPLY-DROPDOWNS-FIXED-2025-12-21 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -8,61 +8,101 @@
   <meta name="description" content="Owner-Operator application. Fast intake with document-ready next steps." />
 
   <style>
-    :root { --bg:#0b1220; --text:#e9eefc; --muted:#b8c4e6; --card:rgba(255,255,255,.05); --border:rgba(255,255,255,.10); --good:#a7f3d0; --accent:#7dd3fc; }
-    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, var(--bg)); color:var(--text); }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
-    .top a { color: var(--muted); text-decoration:none; font-weight:700; }
-    h1 { margin: 10px 0 8px; font-size: clamp(26px, 4vw, 36px); }
-    p { color: var(--muted); line-height:1.5; margin: 8px 0; }
-    .card { background: var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 760px){ .grid { grid-template-columns: 1fr; } }
-    label { display:block; font-weight:800; margin: 10px 0 6px; }
+    :root {
+      --bg:#0b1220;
+      --text:#e9eefc;
+      --muted:#b8c4e6;
+      --card:rgba(255,255,255,.05);
+      --border:rgba(255,255,255,.10);
+      --good:#a7f3d0;
+      --accent:#7dd3fc;
+    }
+
+    body {
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg,#070b14, var(--bg));
+      color:var(--text);
+    }
+
+    .wrap { max-width:900px; margin:0 auto; padding:24px; }
+    .top a { color:var(--muted); text-decoration:none; font-weight:700; }
+    h1 { margin:10px 0 8px; font-size:clamp(26px,4vw,36px); }
+    p { color:var(--muted); line-height:1.5; margin:8px 0; }
+
+    .card {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:760px){
+      .grid { grid-template-columns:1fr; }
+    }
+
+    label { display:block; font-weight:800; margin:10px 0 6px; }
+
     input, textarea, select {
-      width: 100%;
-      background: rgba(255,255,255,.06);
-      color: var(--text);
+      width:100%;
+      background:rgba(255,255,255,.06);
+      color:var(--text);
       border:1px solid rgba(255,255,255,.14);
       border-radius:12px;
-      padding:12px 12px;
+      padding:12px;
       font-weight:700;
-      outline: none;
-      box-sizing: border-box;
+      box-sizing:border-box;
     }
-    textarea { min-height: 110px; resize: vertical; }
-    .btn { appearance:none; border:0; border-radius:14px; padding:14px 16px; font-weight:900; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
-    .btnPrimary { background: linear-gradient(90deg, var(--accent), var(--good)); color:#051018; width:100%; }
-    .btnGhost { background: rgba(255,255,255,.06); color:var(--text); border:1px solid rgba(255,255,255,.12); width:100%; margin-top:10px; }
-    .note { margin-top: 10px; font-size: 13px; }
-    .status { margin-top: 12px; padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12); }
-    .hide { display:none; }
-    .ok { border-color: rgba(167,243,208,.35); color: var(--good); }
-    .bad { border-color: rgba(252,165,165,.35); color: #fca5a5; }
 
-    /* honeypot field hidden */
-    .hp { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
-
-    /* ✅ Dropdowns: force native select rendering + make arrow obvious */
-    select{
-      appearance: auto;
+    /* 🔑 FIX: FORCE NATIVE DROPDOWN UI */
+    select {
       -webkit-appearance: menulist;
-      -moz-appearance: menulist;
-      padding-right: 44px;
-      background-color: rgba(255,255,255,.12);
-      border-color: rgba(255,255,255,.22);
-      cursor: pointer;
-      background-image:
-        linear-gradient(45deg, transparent 50%, rgba(233,238,252,.95) 50%),
-        linear-gradient(135deg, rgba(233,238,252,.95) 50%, transparent 50%);
-      background-position:
-        calc(100% - 20px) 50%,
-        calc(100% - 14px) 50%;
-      background-size: 6px 6px, 6px 6px;
-      background-repeat: no-repeat;
+      appearance: menulist;
+      background-color: rgba(255,255,255,.06);
     }
 
-    /* Little helper line */
-    .micro { font-size:12px; color: rgba(184,196,230,.85); margin-top:6px; }
+    textarea { min-height:110px; resize:vertical; }
+
+    .btn {
+      border:0;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:900;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .btnPrimary {
+      background:linear-gradient(90deg,var(--accent),var(--good));
+      color:#051018;
+      width:100%;
+    }
+
+    .btnGhost {
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.12);
+      width:100%;
+      margin-top:10px;
+      text-decoration:none;
+    }
+
+    .note { font-size:13px; margin-top:10px; }
+
+    .hp {
+      position:absolute;
+      left:-10000px;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+    }
   </style>
 
   <!-- Cloudflare Turnstile -->
@@ -70,162 +110,89 @@
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="top">
-      <a href="/index.html">← Back</a>
-    </div>
-
-    <h1>Owner-Operator Application</h1>
-    <p>Fill this out and we’ll respond fast. Have your CDL + insurance ready for the next step.</p>
-
-    <div class="card">
-      <form id="applyForm"
-            name="oo-application"
-            method="POST"
-            data-netlify="true"
-            netlify
-            data-netlify-honeypot="bot-field"
-            data-netlify-redirect="/thank-you.html">
-
-        <!-- Required for Netlify form capture -->
-        <input type="hidden" name="form-name" value="oo-application" />
-
-        <!-- Timestamp field (anti-instant-submit bots) -->
-        <input type="hidden" id="page_ts" name="page_ts" value="" />
-
-        <!-- Honeypot (spam trap) -->
-        <p class="hp">
-          <label>Don’t fill this out: <input name="bot-field" /></label>
-        </p>
-
-        <div class="grid">
-          <div>
-            <label for="contact_name">Full Name *</label>
-            <input id="contact_name" name="contact_name" required autocomplete="name" />
-          </div>
-          <div>
-            <label for="phone">Phone *</label>
-            <input id="phone" name="phone" required autocomplete="tel" inputmode="tel" placeholder="555-555-5555" />
-          </div>
-
-          <div>
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" autocomplete="email" placeholder="name@email.com" />
-          </div>
-          <div>
-            <label for="home_zip">Home ZIP</label>
-            <input id="home_zip" name="home_zip" autocomplete="postal-code" inputmode="numeric" />
-          </div>
-
-          <div>
-            <label for="equipment_type">Equipment Type</label>
-            <select id="equipment_type" name="equipment_type">
-              <option value="">— choose —</option>
-              <option>Dry Van</option>
-              <option>Reefer</option>
-              <option>Flatbed</option>
-              <option>Power Only</option>
-              <option>Other</option>
-            </select>
-            <div class="micro">Tap to open options ▾</div>
-          </div>
-
-          <div>
-            <label for="truck_count"># of Trucks</label>
-            <select id="truck_count" name="truck_count">
-              <option value="">— choose —</option>
-              <option>1</option>
-              <option>2–3</option>
-              <option>4–10</option>
-              <option>10+</option>
-            </select>
-            <div class="micro">Tap to open options ▾</div>
-          </div>
-        </div>
-
-        <label for="preferred_regions">Preferred Regions / Lanes</label>
-        <textarea id="preferred_regions" name="preferred_regions" placeholder="Example: Midwest lanes, avoid Chicago, prefer 450–550 mile legs"></textarea>
-
-        <label for="notes">Notes</label>
-        <textarea id="notes" name="notes" placeholder="Anything we should know?"></textarea>
-
-        <!-- Turnstile widget -->
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAACHzcY4o_6jnmTso" data-theme="dark"></div>
-
-        <button class="btn btnPrimary" type="submit" id="submitBtn">Submit Application →</button>
-        <a class="btn btnGhost" href="/index.html">Back to Home</a>
-
-        <div id="statusOk" class="status ok hide">Submitting… please wait.</div>
-        <div id="statusBad" class="status bad hide">Please complete the anti-bot check and try again.</div>
-
-        <p class="note">Bot protection is enabled. If you don’t see the widget, refresh the page.</p>
-      </form>
-    </div>
+<div class="wrap">
+  <div class="top">
+    <a href="/index.html">← Back</a>
   </div>
 
-  <script>
-    const form = document.getElementById("applyForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const ok = document.getElementById("statusOk");
-    const bad = document.getElementById("statusBad");
+  <h1>Owner-Operator Application</h1>
+  <p>Fast intake. If qualified, we’ll reach out directly.</p>
 
-    function show(el){ el.classList.remove("hide"); }
-    function hide(el){ el.classList.add("hide"); }
+  <div class="card">
+    <form
+      name="oo-application"
+      method="POST"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      action="/thank-you.html">
 
-    // Stamp load time (anti-instant-submit)
-    const pageLoadedAt = Date.now();
-    document.getElementById("page_ts").value = String(pageLoadedAt);
+      <input type="hidden" name="form-name" value="oo-application" />
 
-    // Throttle repeats
-    const THROTTLE_MS = 20000;
-    const key = "bd_apply_last_submit_ts";
+      <p class="hp">
+        <label>Don’t fill this out <input name="bot-field" /></label>
+      </p>
 
-    // Minimum time on page before submit (helps block instant bots)
-    const MIN_TIME_ON_PAGE_MS = 2500;
+      <div class="grid">
+        <div>
+          <label>Full Name *</label>
+          <input name="contact_name" required />
+        </div>
 
-    form.addEventListener("submit", (e) => {
-      hide(bad);
-      show(ok);
+        <div>
+          <label>Phone *</label>
+          <input name="phone" required inputmode="tel" />
+        </div>
 
-      // Honeypot: if filled, block quietly
-      const hp = (form.querySelector('input[name="bot-field"]') || {}).value || "";
-      if (hp.trim()) { e.preventDefault(); hide(ok); return; }
+        <div>
+          <label>Email</label>
+          <input name="email" type="email" />
+        </div>
 
-      // Turnstile token must exist
-      const token = (form.querySelector('input[name="cf-turnstile-response"]') || {}).value || "";
-      if (!token) {
-        e.preventDefault();
-        hide(ok);
-        show(bad);
-        try { if (window.turnstile) turnstile.reset(); } catch {}
-        return;
-      }
+        <div>
+          <label>Home ZIP</label>
+          <input name="home_zip" inputmode="numeric" />
+        </div>
 
-      // Min time on page
-      const now = Date.now();
-      if (now - pageLoadedAt < MIN_TIME_ON_PAGE_MS) {
-        e.preventDefault();
-        hide(ok);
-        show(bad);
-        bad.textContent = "Please wait a moment, then submit again.";
-        return;
-      }
+        <div>
+          <label>Equipment Type</label>
+          <select name="equipment_type">
+            <option value="">— choose —</option>
+            <option>Dry Van</option>
+            <option>Reefer</option>
+            <option>Flatbed</option>
+            <option>Power Only</option>
+            <option>Other</option>
+          </select>
+        </div>
 
-      // Throttle repeats
-      const last = parseInt(localStorage.getItem(key) || "0", 10);
-      if (now - last < THROTTLE_MS) {
-        e.preventDefault();
-        hide(ok);
-        show(bad);
-        bad.textContent = "Please wait a moment and try again.";
-        return;
-      }
-      localStorage.setItem(key, String(now));
+        <div>
+          <label># of Trucks</label>
+          <select name="truck_count">
+            <option value="">— choose —</option>
+            <option>1</option>
+            <option>2–3</option>
+            <option>4–10</option>
+            <option>10+</option>
+          </select>
+        </div>
+      </div>
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitting…";
-      // Let the normal POST happen (Netlify Forms handles it)
-    });
-  </script>
+      <label>Preferred Regions / Lanes</label>
+      <textarea name="preferred_regions"></textarea>
+
+      <label>Notes</label>
+      <textarea name="notes"></textarea>
+
+      <div class="cf-turnstile"
+           data-sitekey="0x4AAAAAACHzcY4o_6jnmTso"
+           data-theme="dark"></div>
+
+      <button class="btn btnPrimary" type="submit">Submit Application →</button>
+      <a class="btn btnGhost" href="/index.html">Back to Home</a>
+
+      <p class="note">Bot protection enabled.</p>
+    </form>
+  </div>
+</div>
 </body>
 </html>
