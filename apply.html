@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- VERSION: APPLY-DROPDOWNS-2025-12-21-1 -->
+<!-- VERSION: APPLY-DROPDOWNS-2025-12-21-2 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -41,6 +41,15 @@
 
     /* honeypot field hidden */
     .hp { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+
+    /* ✅ DROPDOWN FIX: force native select rendering + arrow visibility */
+    select{
+      appearance: auto;
+      -webkit-appearance: menulist;
+      -moz-appearance: menulist;
+      background-color: rgba(255,255,255,.10);
+      cursor: pointer;
+    }
   </style>
 
   <!-- Cloudflare Turnstile -->
