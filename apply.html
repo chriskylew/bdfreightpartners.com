@@ -61,14 +61,15 @@
         Netlify Forms:
         - data-netlify="true" is the key
         - "netlify" attribute (no value) helps some setups detect forms
+        - data-netlify-redirect prevents POST-to-static-file 404s
       -->
       <form id="applyForm"
             name="oo-application"
             method="POST"
-            action="/thank-you.html"
             data-netlify="true"
             netlify
-            data-netlify-honeypot="bot-field">
+            data-netlify-honeypot="bot-field"
+            data-netlify-redirect="https://bdfreightpartners.com/thank-you.html">
 
         <!-- Required for Netlify to recognize the form -->
         <input type="hidden" name="form-name" value="oo-application" />
@@ -190,7 +191,7 @@
       submitBtn.disabled = true;
       submitBtn.textContent = "Submitting…";
 
-      // Allow normal POST to Netlify Forms (action="/thank-you.html")
+      // Allow normal POST to Netlify Forms. Netlify handles redirect via data-netlify-redirect.
     });
   </script>
 </body>
