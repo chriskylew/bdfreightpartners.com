@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Apply — B & D Freight Partners</title>
+  <title>Apply — B &amp; D Freight Partners</title>
   <meta name="description" content="Owner-Operator application. Fast intake with document-ready next steps." />
+
   <style>
     :root { --bg:#0b1220; --text:#e9eefc; --muted:#b8c4e6; --card:rgba(255,255,255,.05); --border:rgba(255,255,255,.10); --good:#a7f3d0; --accent:#7dd3fc; }
     body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, var(--bg)); color:var(--text); }
@@ -36,22 +37,40 @@
     .hide { display:none; }
     .ok { border-color: rgba(167,243,208,.35); color: var(--good); }
     .bad { border-color: rgba(252,165,165,.35); color: #fca5a5; }
+
+    /* honeypot field hidden */
+    .hp { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
   </style>
 
-  <!-- Cloudflare Turnstile (front-end). You will paste your SITE KEY below. -->
+  <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
-      <a href="index.html">← Back</a>
+      <a href="/index.html">← Back</a>
     </div>
 
     <h1>Owner-Operator Application</h1>
     <p>Fill this out and we’ll respond fast. Have your CDL + insurance ready for the next step.</p>
 
     <div class="card">
-      <form id="applyForm">
+      <form id="applyForm"
+            name="oo-application"
+            method="POST"
+            action="/thank-you.html"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field">
+
+        <!-- Required for Netlify to recognize the form -->
+        <input type="hidden" name="form-name" value="oo-application" />
+
+        <!-- Honeypot -->
+        <p class="hp">
+          <label>Don’t fill this out: <input name="bot-field" /></label>
+        </p>
+
         <div class="grid">
           <div>
             <label for="contact_name">Full Name *</label>
@@ -99,16 +118,15 @@
         <textarea id="notes" name="notes" placeholder="Anything we should know?"></textarea>
 
         <!-- Turnstile widget -->
-        <!-- TODO: Replace YOUR_SITE_KEY_HERE with the Turnstile SITE KEY (public key) -->
         <div class="cf-turnstile" data-sitekey="0x4AAAAAACHzcY4o_6jnmTso" data-theme="dark"></div>
 
         <button class="btn btnPrimary" type="submit" id="submitBtn">Submit Application →</button>
-        <a class="btn btnGhost" href="index.html">Back to Home</a>
+        <a class="btn btnGhost" href="/index.html">Back to Home</a>
 
-        <div id="statusOk" class="status ok hide">Submitted. Redirecting…</div>
-        <div id="statusBad" class="status bad hide">Something went wrong. Please try again in a moment.</div>
+        <div id="statusOk" class="status ok hide">Submitting…</div>
+        <div id="statusBad" class="status bad hide">Please complete the anti-bot check and try again.</div>
 
-        <p class="note">Bot protection is enabled. If you don’t see the checkbox, refresh the page.</p>
+        <p class="note">Bot protection is enabled. If you don’t see the widget, refresh the page.</p>
       </form>
     </div>
   </div>
@@ -122,48 +140,41 @@
     function show(el){ el.classList.remove("hide"); }
     function hide(el){ el.classList.add("hide"); }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      hide(ok); hide(bad);
+    // light throttle
+    const THROTTLE_MS = 12000;
+    const key = "bd_apply_last_submit_ts";
+
+    form.addEventListener("submit", (e) => {
+      hide(bad); show(ok);
+
+      // Honeypot: if filled, block quietly
+      const hp = (form.querySelector('input[name="bot-field"]') || {}).value || "";
+      if (hp.trim()) { e.preventDefault(); hide(ok); return; }
+
+      // Turnstile token must exist
+      const token = (form.querySelector('input[name="cf-turnstile-response"]') || {}).value || "";
+      if (!token) {
+        e.preventDefault();
+        hide(ok);
+        show(bad);
+        try { if (window.turnstile) turnstile.reset(); } catch {}
+        return;
+      }
+
+      const last = parseInt(localStorage.getItem(key) || "0", 10);
+      const now = Date.now();
+      if (now - last < THROTTLE_MS) {
+        e.preventDefault();
+        hide(ok);
+        show(bad);
+        bad.textContent = "Please wait a moment and try again.";
+        return;
+      }
+      localStorage.setItem(key, String(now));
+
       submitBtn.disabled = true;
       submitBtn.textContent = "Submitting…";
-
-      try {
-        // Turnstile places its token into a hidden input named "cf-turnstile-response"
-        const token = (form.querySelector('input[name="cf-turnstile-response"]') || {}).value || "";
-        if (!token) throw new Error("Missing Turnstile token");
-
-        const payload = {
-          contact_name: form.contact_name.value.trim(),
-          phone: form.phone.value.trim(),
-          email: (form.email.value || "").trim(),
-          home_zip: (form.home_zip.value || "").trim(),
-          equipment_type: (form.equipment_type.value || "").trim(),
-          truck_count: (form.truck_count.value || "").trim(),
-          preferred_regions: (form.preferred_regions.value || "").trim(),
-          notes: (form.notes.value || "").trim(),
-          "cf-turnstile-response": token
-        };
-
-        const r = await fetch("/.netlify/functions/apply", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await r.json().catch(() => ({}));
-        if (!r.ok || !data.ok) throw new Error(data.error || "submit_failed");
-
-        show(ok);
-        setTimeout(() => { window.location.href = "thank-you.html"; }, 700);
-      } catch (err) {
-        console.error(err);
-        show(bad);
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Submit Application →";
-        // Optional: reset Turnstile so they can try again
-        try { if (window.turnstile) turnstile.reset(); } catch {}
-      }
+      // Allow normal POST to Netlify Forms
     });
   </script>
 </body>
