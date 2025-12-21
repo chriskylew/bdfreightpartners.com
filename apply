@@ -100,7 +100,7 @@
 
         <!-- Turnstile widget -->
         <!-- TODO: Replace YOUR_SITE_KEY_HERE with the Turnstile SITE KEY (public key) -->
-        <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY_HERE" data-theme="dark"></div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAACHzcY4o_6jnmTso" data-theme="dark"></div>
 
         <button class="btn btnPrimary" type="submit" id="submitBtn">Submit Application →</button>
         <a class="btn btnGhost" href="index.html">Back to Home</a>
