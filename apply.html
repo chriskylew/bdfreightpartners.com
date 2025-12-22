@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- VERSION: APPLY-DROPDOWNS-FIXED-2025-12-21 -->
+<!-- VERSION: APPLY-DROPDOWNS-FIXED-2025-12-21-2 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -8,7 +8,7 @@
   <meta name="description" content="Owner-Operator application. Fast intake with document-ready next steps." />
 
   <style>
-    :root {
+    :root{
       --bg:#0b1220;
       --text:#e9eefc;
       --muted:#b8c4e6;
@@ -18,37 +18,37 @@
       --accent:#7dd3fc;
     }
 
-    body {
+    body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:linear-gradient(180deg,#070b14, var(--bg));
       color:var(--text);
     }
 
-    .wrap { max-width:900px; margin:0 auto; padding:24px; }
-    .top a { color:var(--muted); text-decoration:none; font-weight:700; }
-    h1 { margin:10px 0 8px; font-size:clamp(26px,4vw,36px); }
-    p { color:var(--muted); line-height:1.5; margin:8px 0; }
+    .wrap{ max-width:900px; margin:0 auto; padding:24px; }
+    .top a{ color:var(--muted); text-decoration:none; font-weight:700; }
+    h1{ margin:10px 0 8px; font-size:clamp(26px,4vw,36px); }
+    p{ color:var(--muted); line-height:1.5; margin:8px 0; }
 
-    .card {
+    .card{
       background:var(--card);
       border:1px solid var(--border);
       border-radius:18px;
       padding:16px;
     }
 
-    .grid {
+    .grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:12px;
     }
     @media (max-width:760px){
-      .grid { grid-template-columns:1fr; }
+      .grid{ grid-template-columns:1fr; }
     }
 
-    label { display:block; font-weight:800; margin:10px 0 6px; }
+    label{ display:block; font-weight:800; margin:10px 0 6px; }
 
-    input, textarea, select {
+    input, textarea, select{
       width:100%;
       background:rgba(255,255,255,.06);
       color:var(--text);
@@ -57,18 +57,38 @@
       padding:12px;
       font-weight:700;
       box-sizing:border-box;
+      outline:none;
     }
 
-    /* 🔑 FIX: FORCE NATIVE DROPDOWN UI */
-    select {
-      -webkit-appearance: menulist;
-      appearance: menulist;
-      background-color: rgba(255,255,255,.06);
+    textarea{ min-height:110px; resize:vertical; }
+
+    /* ✅ DROPDOWN VISIBILITY / NATIVE CONTROL FIX */
+    select{
+      display:block;
+      height:46px;
+      line-height:1.2;
+      cursor:pointer;
+
+      /* force native dropdown UI */
+      -webkit-appearance: menulist !important;
+      -moz-appearance: menulist !important;
+      appearance: menulist !important;
+
+      background-color: rgba(255,255,255,.06) !important;
+      color: var(--text) !important;
+
+      /* space for the arrow + prevent clipping */
+      padding-right: 36px;
+      background-clip: padding-box;
     }
 
-    textarea { min-height:110px; resize:vertical; }
+    /* make sure options are readable in the popup menu */
+    select option{
+      color:#0b1220;
+      background:#ffffff;
+    }
 
-    .btn {
+    .btn{
       border:0;
       border-radius:14px;
       padding:14px 16px;
@@ -77,26 +97,25 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-    }
-
-    .btnPrimary {
-      background:linear-gradient(90deg,var(--accent),var(--good));
-      color:#051018;
       width:100%;
     }
 
-    .btnGhost {
+    .btnPrimary{
+      background:linear-gradient(90deg,var(--accent),var(--good));
+      color:#051018;
+    }
+
+    .btnGhost{
       background:rgba(255,255,255,.06);
       color:var(--text);
       border:1px solid rgba(255,255,255,.12);
-      width:100%;
       margin-top:10px;
       text-decoration:none;
     }
 
-    .note { font-size:13px; margin-top:10px; }
+    .note{ font-size:13px; margin-top:10px; }
 
-    .hp {
+    .hp{
       position:absolute;
       left:-10000px;
       width:1px;
@@ -123,39 +142,42 @@
       name="oo-application"
       method="POST"
       data-netlify="true"
+      netlify
       data-netlify-honeypot="bot-field"
       action="/thank-you.html">
 
+      <!-- Required for Netlify form capture -->
       <input type="hidden" name="form-name" value="oo-application" />
 
+      <!-- Honeypot (spam trap) -->
       <p class="hp">
-        <label>Don’t fill this out <input name="bot-field" /></label>
+        <label>Don’t fill this out <input name="bot-field" autocomplete="off" /></label>
       </p>
 
       <div class="grid">
         <div>
-          <label>Full Name *</label>
-          <input name="contact_name" required />
+          <label for="contact_name">Full Name *</label>
+          <input id="contact_name" name="contact_name" required autocomplete="name" />
         </div>
 
         <div>
-          <label>Phone *</label>
-          <input name="phone" required inputmode="tel" />
+          <label for="phone">Phone *</label>
+          <input id="phone" name="phone" required inputmode="tel" autocomplete="tel" placeholder="555-555-5555" />
         </div>
 
         <div>
-          <label>Email</label>
-          <input name="email" type="email" />
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="name@email.com" />
         </div>
 
         <div>
-          <label>Home ZIP</label>
-          <input name="home_zip" inputmode="numeric" />
+          <label for="home_zip">Home ZIP</label>
+          <input id="home_zip" name="home_zip" inputmode="numeric" autocomplete="postal-code" />
         </div>
 
         <div>
-          <label>Equipment Type</label>
-          <select name="equipment_type">
+          <label for="equipment_type">Equipment Type</label>
+          <select id="equipment_type" name="equipment_type">
             <option value="">— choose —</option>
             <option>Dry Van</option>
             <option>Reefer</option>
@@ -166,8 +188,8 @@
         </div>
 
         <div>
-          <label># of Trucks</label>
-          <select name="truck_count">
+          <label for="truck_count"># of Trucks</label>
+          <select id="truck_count" name="truck_count">
             <option value="">— choose —</option>
             <option>1</option>
             <option>2–3</option>
@@ -177,11 +199,11 @@
         </div>
       </div>
 
-      <label>Preferred Regions / Lanes</label>
-      <textarea name="preferred_regions"></textarea>
+      <label for="preferred_regions">Preferred Regions / Lanes</label>
+      <textarea id="preferred_regions" name="preferred_regions" placeholder="Example: Midwest lanes, avoid Chicago, prefer 450–550 mile legs"></textarea>
 
-      <label>Notes</label>
-      <textarea name="notes"></textarea>
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes" placeholder="Anything we should know?"></textarea>
 
       <div class="cf-turnstile"
            data-sitekey="0x4AAAAAACHzcY4o_6jnmTso"
