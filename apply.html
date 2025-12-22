@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- VERSION: APPLY-DROPDOWNS-FIXED-2025-12-21-2 -->
+<!-- VERSION: APPLY-DROPDOWNS-FIXED-2025-12-21-3 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -52,7 +52,7 @@
       width:100%;
       background:rgba(255,255,255,.06);
       color:var(--text);
-      border:1px solid rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.14);
       border-radius:12px;
       padding:12px;
       font-weight:700;
@@ -77,9 +77,26 @@
       background-color: rgba(255,255,255,.06) !important;
       color: var(--text) !important;
 
-      /* space for the arrow + prevent clipping */
-      padding-right: 36px;
+      /* space for arrow + prevent clipping */
+      padding-right: 54px !important;
       background-clip: padding-box;
+    }
+
+    /* ✅ FORCE visible dropdown arrow (even if browser hides native arrow) */
+    select{
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(233,238,252,.95) 50%),
+        linear-gradient(135deg, rgba(233,238,252,.95) 50%, transparent 50%),
+        linear-gradient(to right, rgba(255,255,255,.14), rgba(255,255,255,.14));
+      background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 12px) 50%,
+        calc(100% - 40px) 50%;
+      background-size:
+        6px 6px,
+        6px 6px,
+        1px 22px;
+      background-repeat:no-repeat;
     }
 
     /* make sure options are readable in the popup menu */
