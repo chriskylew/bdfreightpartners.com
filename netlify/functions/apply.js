@@ -3,8 +3,8 @@
 
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const TO_EMAIL = process.env.APPLY_TO_EMAIL || "applications@bdfreightpartners.com";
-const FROM_EMAIL = process.env.APPLY_FROM_EMAIL || "onboarding@resend.dev";
+const TO_EMAIL = process.env.APPLY_TO_EMAIL || "";
+const FROM_EMAIL = process.env.APPLY_FROM_EMAIL || "";
 
 function resp(statusCode, obj) {
   return {
@@ -20,8 +20,12 @@ function resp(statusCode, obj) {
 }
 
 async function verifyTurnstile(token, ip) {
-  if (!TURNSTILE_SECRET) return { ok: false, error: "missing_turnstile_secret" };
-  if (!token) return { ok: false, error: "missing_turnstile_token" };
+  if (!TURNSTILE_SECRET) {
+    return { ok: false, error: "missing_turnstile_secret" };
+  }
+  if (!token) {
+    return { ok: false, error: "missing_turnstile_token" };
+  }
 
   const form = new URLSearchParams();
   form.append("secret", TURNSTILE_SECRET);
@@ -39,7 +43,12 @@ async function verifyTurnstile(token, ip) {
 }
 
 async function sendEmail({ subject, text }) {
-  if (!RESEND_API_KEY) return { ok: false, error: "missing_resend_api_key" };
+  if (!RESEND_API_KEY) {
+    return { ok: false, error: "missing_resend_api_key" };
+  }
+  if (!TO_EMAIL || !FROM_EMAIL) {
+    return { ok: false, error: "email_not_configured" };
+  }
 
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -56,13 +65,21 @@ async function sendEmail({ subject, text }) {
   });
 
   const data = await r.json().catch(() => ({}));
-  if (!r.ok) return { ok: false, error: "resend_failed", detail: data };
+  if (!r.ok) {
+    return { ok: false, error: "resend_failed", detail: data };
+  }
+
   return { ok: true, data };
 }
 
 exports.handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") return resp(200, { ok: true });
-  if (event.httpMethod !== "POST") return resp(405, { ok: false, error: "method_not_allowed" });
+  if (event.httpMethod === "OPTIONS") {
+    return resp(200, { ok: true });
+  }
+
+  if (event.httpMethod !== "POST") {
+    return resp(405, { ok: false, error: "method_not_allowed" });
+  }
 
   let body = {};
   try {
@@ -79,17 +96,24 @@ exports.handler = async (event) => {
 
   // 1) Turnstile verification
   const v = await verifyTurnstile(token, ip);
-  if (!v.ok) return resp(403, { ok: false, error: "turnstile_failed", detail: v.data || v.error });
+  if (!v.ok) {
+    return resp(403, {
+      ok: false,
+      error: "turnstile_failed",
+      detail: v.data || v.error,
+    });
+  }
 
   // 2) Minimal required fields
   const contact_name = (body.contact_name || "").trim();
   const phone = (body.phone || "").trim();
+
   if (!contact_name || !phone) {
     return resp(400, { ok: false, error: "missing_required_fields" });
   }
 
   // 3) Email content
-  const safe = (x) => (x == null ? "" : String(x)).trim();
+  const safe = (x) => (x == null ? "" : String(x).trim());
 
   const subject = `New OO Application: ${contact_name} (${phone})`;
   const text = `New Owner-Operator Application
@@ -113,7 +137,13 @@ Time: ${new Date().toISOString()}
 `;
 
   const sent = await sendEmail({ subject, text });
-  if (!sent.ok) return resp(500, { ok: false, error: sent.error, detail: sent.detail || null });
+  if (!sent.ok) {
+    return resp(500, {
+      ok: false,
+      error: sent.error,
+      detail: sent.detail || null,
+    });
+  }
 
   return resp(200, { ok: true });
 };
