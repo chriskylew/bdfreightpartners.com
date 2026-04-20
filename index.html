@@ -11,8 +11,9 @@
   </script>
 
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>B & D Freight, Inc — Owner-Operator Partnerships</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>B &amp; D Freight, Inc | Owner-Operator Partnerships</title>
+  <meta name="description" content="B & D Freight, Inc partners with independent owner-operators for power-only freight opportunities. Start pre-qualification online." />
 
   <style>
     body {
@@ -20,24 +21,51 @@
       background: #f6f6f6;
       margin: 0;
       padding: 0;
+      color: #111827;
     }
+
     .container {
       max-width: 720px;
       margin: 60px auto;
       background: #ffffff;
       padding: 40px;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
     }
+
     h1 {
       margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 32px;
+      line-height: 1.2;
     }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .intro {
+      margin-bottom: 24px;
+      color: #374151;
+    }
+
     .notice {
-      background: #eee;
-      padding: 15px;
-      border-left: 4px solid #444;
+      background: #f3f4f6;
+      padding: 16px;
+      border-left: 4px solid #1f2937;
       margin-bottom: 30px;
+      border-radius: 4px;
+      color: #1f2937;
     }
+
     .btn {
       display: block;
       width: 100%;
@@ -46,21 +74,62 @@
       font-size: 16px;
       text-align: center;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
       border: none;
+      font-weight: 600;
+      transition: opacity 0.2s ease;
     }
+
+    .btn:hover {
+      opacity: 0.95;
+    }
+
     .btn-primary {
       background: #1f4ed8;
       color: #fff;
     }
+
     .btn-secondary {
-      background: #ccc;
-      color: #000;
+      background: #d1d5db;
+      color: #111827;
     }
+
     .small {
       font-size: 13px;
-      color: #666;
+      color: #6b7280;
       margin-top: 20px;
+    }
+
+    .footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .footer a {
+      color: #1f4ed8;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        margin: 20px;
+        padding: 24px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -70,29 +139,40 @@
     <h1>B &amp; D Freight, Inc</h1>
     <h2>Owner-Operator Partnerships</h2>
 
+    <p class="intro">
+      We partner with independent owner-operators for power-only freight opportunities.
+      Start with a quick pre-qualification so we can determine whether there is a potential fit.
+    </p>
+
     <div class="notice">
       <strong>Important:</strong><br>
-      B &amp; D Freight partners exclusively with independent owner-operators.
-      We do <strong>not</strong> hire company drivers or W-2 employees.
+      B &amp; D Freight works exclusively with independent owner-operators.
+      We do <strong>not</strong> hire company drivers or W-2 employees through this application flow.
     </div>
 
     <p>Please select the option that best describes you:</p>
 
-    <!-- Owner Operator -->
     <button class="btn btn-primary" type="button"
       onclick="window.location.href='/prequal.html';">
-      I am an Owner-Operator with my own truck
+      I Am an Owner-Operator With My Own Truck
     </button>
 
-    <!-- Company Driver -->
     <button class="btn btn-secondary" type="button"
       onclick="window.location.href='/not-a-fit.html';">
-      I am a Company Driver
+      I Am a Company Driver
     </button>
 
     <p class="small">
-      This selection helps ensure we respect everyone’s time.
+      This selection helps direct you to the correct next step and respects everyone’s time.
     </p>
+
+    <div class="footer">
+      <p>
+        By submitting information through this website, you may receive follow-up communication regarding your inquiry or application.
+        View our <a href="/terms.html">Terms and Conditions</a> and
+        <a href="/privacy-policy.html">Privacy Policy</a>.
+      </p>
+    </div>
   </div>
 </body>
 </html>
