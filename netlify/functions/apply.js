@@ -4,7 +4,7 @@
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const TO_EMAIL = process.env.APPLY_TO_EMAIL || "";
-const FROM_EMAIL = process.env.APPLY_FROM_EMAIL || "";
+const FROM_EMAIL = process.env.APPLY_FROM_EMAIL || "BDF Freight <applications@lane-tool.com>";
 
 function resp(statusCode, obj) {
   return {
