@@ -6,30 +6,144 @@
   <title>Pre-Qualify — B & D Freight Partners</title>
   <meta name="description" content="Fast owner-operator pre-qualification. Clear settlement terms explained up front." />
 
-  <!-- ✅ Cloudflare Turnstile loader (leave as-is) -->
+  <!-- Cloudflare Turnstile loader -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <style>
-    :root { --bg:#0b1220; --text:#e9eefc; --muted:#b8c4e6; --card:rgba(255,255,255,.05); --border:rgba(255,255,255,.10); --good:#a7f3d0; --bad:#fca5a5; --accent:#7dd3fc; }
-    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, var(--bg)); color:var(--text); }
-    .wrap { max-width: 860px; margin: 0 auto; padding: 24px; }
-    .top a { color: var(--muted); text-decoration:none; font-weight:700; }
-    .hero { margin-top: 8px; }
-    h1 { margin: 10px 0 8px; font-size: clamp(26px, 4vw, 34px); }
-    p { color: var(--muted); line-height:1.5; margin: 8px 0; }
-    .card { background: var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; }
-    .q { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-top:1px solid rgba(255,255,255,.08); }
-    .q:first-of-type { border-top:0; }
-    .q label { font-weight:700; }
-    select { background: rgba(255,255,255,.06); color: var(--text); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:10px 12px; font-weight:800; min-width: 120px; }
-    .btn { appearance:none; border:0; border-radius:14px; padding:14px 16px; font-weight:900; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
-    .btnPrimary { background: linear-gradient(90deg, var(--accent), var(--good)); color:#051018; width:100%; }
-    .btnGhost { background: rgba(255,255,255,.06); color:var(--text); border:1px solid rgba(255,255,255,.12); width:100%; margin-top:10px; }
-    .result { margin-top:14px; padding:14px; border-radius:16px; border:1px solid rgba(255,255,255,.12); }
-    .hide { display:none; }
-    a { color: var(--accent); }
-    .note { margin-top: 14px; font-size: 13px; }
-    .badge { display:inline-block; padding:6px 10px; border:1px solid rgba(255,255,255,.16); border-radius:999px; color:var(--muted); font-size:13px; }
+    :root {
+      --bg: #0b1220;
+      --text: #e9eefc;
+      --muted: #b8c4e6;
+      --card: rgba(255,255,255,.05);
+      --border: rgba(255,255,255,.10);
+      --good: #a7f3d0;
+      --bad: #fca5a5;
+      --accent: #7dd3fc;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #070b14, var(--bg));
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .top a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .hero {
+      margin-top: 8px;
+    }
+
+    h1 {
+      margin: 10px 0 8px;
+      font-size: clamp(26px, 4vw, 34px);
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 8px 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .q {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .q:first-of-type {
+      border-top: 0;
+    }
+
+    .q label {
+      font-weight: 700;
+    }
+
+    select {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 800;
+      min-width: 120px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btnPrimary {
+      background: linear-gradient(90deg, var(--accent), var(--good));
+      color: #051018;
+      width: 100%;
+    }
+
+    .btnGhost {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .result {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .hide {
+      display: none;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 13px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -46,31 +160,53 @@
 
     <div class="card">
       <div class="q">
-        <label>Valid CDL-A?</label>
-        <select id="q1"><option value="yes">Yes</option><option value="no">No</option></select>
-      </div>
-      <div class="q">
-        <label>2+ years driving experience?</label>
-        <select id="q2"><option value="yes">Yes</option><option value="no">No</option></select>
-      </div>
-      <div class="q">
-        <label>Owner-operator with your own truck?</label>
-        <select id="q3"><option value="yes">Yes</option><option value="no">No</option></select>
-      </div>
-      <div class="q">
-        <label>Willing to consent to MVR?</label>
-        <select id="q4"><option value="yes">Yes</option><option value="no">No</option></select>
-      </div>
-      <div class="q">
-        <label>Can upload CDL + insurance documents?</label>
-        <select id="q5"><option value="yes">Yes</option><option value="no">No</option></select>
-      </div>
-      <div class="q">
-        <label>Available to start within 7–14 days?</label>
-        <select id="q6"><option value="yes">Yes</option><option value="no">No</option></select>
+        <label for="q1">Valid CDL-A?</label>
+        <select id="q1">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
 
-      <!-- ✅ Turnstile widget -->
+      <div class="q">
+        <label for="q2">2+ years driving experience?</label>
+        <select id="q2">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="q">
+        <label for="q3">Owner-operator with your own truck?</label>
+        <select id="q3">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="q">
+        <label for="q4">Willing to consent to MVR?</label>
+        <select id="q4">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="q">
+        <label for="q5">Can upload CDL + insurance documents?</label>
+        <select id="q5">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="q">
+        <label for="q6">Available to start within 7–14 days?</label>
+        <select id="q6">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
       <div id="tsWrap" style="margin:12px 0;">
         <div
           class="cf-turnstile"
@@ -97,24 +233,30 @@
       </div>
     </div>
 
-    <p class="note">Note: Pre-qual helps us respond faster. Final qualification is confirmed during onboarding.</p>
+    <p class="note">
+      Note: Pre-qualification helps us respond faster. Final qualification is confirmed during onboarding.
+    </p>
+
+    <p class="note">
+      By proceeding, you agree that B &amp; D Freight Partners may contact you regarding your inquiry or application by SMS or email.
+      Message frequency varies. Message and data rates may apply.
+      You may opt out at any time by replying STOP.
+      View our <a href="terms.html">Terms</a> and <a href="privacy-policy.html">Privacy Policy</a>.
+    </p>
   </div>
 
   <script>
-    const qs = ["q1","q2","q3","q4","q5","q6"].map(id => document.getElementById(id));
+    const qs = ["q1", "q2", "q3", "q4", "q5", "q6"].map(id => document.getElementById(id));
     const pass = document.getElementById("pass");
     const fail = document.getElementById("fail");
     const checkBtn = document.getElementById("checkBtn");
 
-    // Turnstile token (set after successful challenge)
     let turnstileToken = "";
 
-    // Disable the button until Turnstile passes
     checkBtn.disabled = true;
     checkBtn.style.opacity = "0.6";
     checkBtn.style.cursor = "not-allowed";
 
-    // Turnstile callbacks
     window.onTurnstileSuccess = function(token) {
       turnstileToken = token || "";
       checkBtn.disabled = false;
@@ -147,7 +289,6 @@
       fail.classList.toggle("hide", allYes);
 
       if (allYes) {
-        // ✅ Redirect immediately to the real application page
         window.location.href = "apply.html";
       }
     });
