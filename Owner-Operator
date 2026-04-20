@@ -1,34 +1,41 @@
-# Freight Partner Recruitment Funnel
+# BD Freight Partners Recruitment Funnel
 
 ## Overview
-This project is a recruitment and lead intake funnel for freight partners.
+This project is a freight partner recruitment and lead intake funnel built to support owner-operator recruiting.
 
-It supports applicant pre-qualification, full application submission, follow-up workflows, and compliance pages required for messaging and contact operations.
+It includes a pre-qualification flow, a full application flow, compliance pages for messaging, and serverless backend handling for applicant submissions.
 
 ## Tech Stack
 - Netlify for hosting and serverless functions
-- Twilio for SMS campaign and messaging workflows
+- Twilio for SMS campaign setup and messaging workflows
 - Resend for transactional email delivery
-- Cloudflare for DNS, security, and performance
+- Cloudflare for DNS, security, performance, and bot protection
 
 ## Features
+- Owner-operator landing and routing flow
 - Pre-qualification flow
 - Full application flow
 - Thank-you and redirect handling
-- Privacy Policy and Terms pages for compliance support
-- Netlify Functions for backend form processing
+- Privacy Policy and Terms pages for messaging compliance
+- Cloudflare Turnstile bot protection
+- Netlify Functions for backend form processing and email delivery
 
 ## Current Status
 - Twilio campaign submitted for review
-- Compliance pages are live and working
-- Recruitment funnel is deployed
-- Repository is being prepared for system integration and recruiter review
+- Compliance pages are live and accessible
+- Recruitment funnel is deployed and functional
+- Repository has been cleaned and organized for professional review
 
 ## Next Steps
 - Move prequal and application flows into the Lanetool system
-- Add lead tracking and status handling
+- Add lead tracking and workflow status management
 - Improve validation and modular structure
 - Expand compliance content as needed
+
+## Project Purpose
+This repository serves as the public-facing recruitment funnel for BD Freight Partners.
+
+It is designed to capture applicant interest, qualify owner-operators, and support compliant follow-up communication while a deeper Lanetool workflow is developed separately.
 
 ## Author
 Christopher Wallace
