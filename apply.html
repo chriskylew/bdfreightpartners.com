@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- VERSION: APPLY-NETLIFY-FUNCTION-FIX-2026-04-20-1 -->
+<!-- VERSION: APPLY-NETLIFY-FUNCTION-FIX-2026-04-20-2 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -66,33 +66,7 @@
     select{
       display:block;
       height:46px;
-      line-height:1.2;
       cursor:pointer;
-      -webkit-appearance: menulist !important;
-      -moz-appearance: menulist !important;
-      appearance: menulist !important;
-      background-color: rgba(255,255,255,.06) !important;
-      color: var(--text) !important;
-      padding-right: 54px !important;
-      background-clip: padding-box;
-      background-image:
-        linear-gradient(45deg, transparent 50%, rgba(233,238,252,.95) 50%),
-        linear-gradient(135deg, rgba(233,238,252,.95) 50%, transparent 50%),
-        linear-gradient(to right, rgba(255,255,255,.14), rgba(255,255,255,.14));
-      background-position:
-        calc(100% - 18px) 50%,
-        calc(100% - 12px) 50%,
-        calc(100% - 40px) 50%;
-      background-size:
-        6px 6px,
-        6px 6px,
-        1px 22px;
-      background-repeat:no-repeat;
-    }
-
-    select option{
-      color:#0b1220;
-      background:#ffffff;
     }
 
     .btn{
@@ -170,10 +144,13 @@
   </div>
 
   <h1>Owner-Operator Application</h1>
-  <p>Fast intake. If qualified, we’ll reach out directly.</p>
+  <p>
+    Fast intake. If qualified, we’ll review your application and reach out directly.
+  </p>
 
   <div class="card">
     <form id="appForm" novalidate>
+
       <p class="hp">
         <label>Don’t fill this out <input name="bot-field" autocomplete="off" /></label>
       </p>
@@ -191,7 +168,7 @@
 
         <div>
           <label for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" placeholder="name@email.com" />
+          <input id="email" name="email" type="email" autocomplete="email" />
         </div>
 
         <div>
@@ -224,10 +201,10 @@
       </div>
 
       <label for="preferred_regions">Preferred Regions / Lanes</label>
-      <textarea id="preferred_regions" name="preferred_regions" placeholder="Example: Midwest lanes, avoid Chicago, prefer 450–550 mile legs"></textarea>
+      <textarea id="preferred_regions" name="preferred_regions"></textarea>
 
       <label for="notes">Notes</label>
-      <textarea id="notes" name="notes" placeholder="Anything we should know?"></textarea>
+      <textarea id="notes" name="notes"></textarea>
 
       <div
         class="cf-turnstile"
@@ -240,7 +217,17 @@
 
       <div id="statusMsg" class="status" aria-live="polite"></div>
 
-      <p class="note">Bot protection enabled.</p>
+      <p class="note">
+        Bot protection enabled.
+      </p>
+
+      <p class="note">
+        By submitting this application, you agree that B &amp; D Freight Partners may contact you regarding your inquiry or application via SMS or email.
+        Message frequency varies. Message and data rates may apply.
+        You may opt out at any time by replying STOP.
+        View our <a href="/terms.html">Terms</a> and <a href="/privacy-policy.html">Privacy Policy</a>.
+      </p>
+
     </form>
   </div>
 </div>
@@ -257,6 +244,7 @@
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+
     statusMsg.className = "status";
     statusMsg.textContent = "";
 
@@ -302,24 +290,17 @@
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok || !result.ok) {
-        const detail =
-          result?.error ||
-          result?.detail?.error ||
-          "Unable to submit right now. Please try again.";
-        showStatus(`Submission failed: ${detail}`, "error");
-        if (window.turnstile) {
-          window.turnstile.reset();
-        }
+        showStatus("Submission failed. Please try again.", "error");
+        if (window.turnstile) window.turnstile.reset();
         return;
       }
 
       showStatus("Application submitted successfully. Redirecting...", "success");
       window.location.href = "/thank-you.html";
+
     } catch (error) {
-      showStatus("Network error. Please try again in a moment.", "error");
-      if (window.turnstile) {
-        window.turnstile.reset();
-      }
+      showStatus("Network error. Please try again.", "error");
+      if (window.turnstile) window.turnstile.reset();
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit Application →";
