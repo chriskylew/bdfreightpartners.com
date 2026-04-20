@@ -1,51 +1,51 @@
-# BD Freight Partners Recruitment Funnel
+BD Freight Partners Recruitment Funnel
+Overview
 
-## Overview
-This project is a freight partner recruitment and lead intake funnel.
+A production-ready recruitment funnel designed to onboard freight partners through a structured pre-qualification and application workflow.
 
-It enables potential drivers or freight partners to complete a pre-qualification step, submit an application, and enter a communication workflow supported by SMS and email systems.
+The system captures, filters, and routes candidate data while integrating automated SMS and email communication to support scalable partner acquisition.
 
-## Tech Stack
-- Netlify (hosting and serverless functions)
-- Twilio (SMS campaign and messaging workflows)
-- Resend (transactional email delivery)
-- Cloudflare (DNS, security, and performance)
+Tech Stack
+Netlify — Hosting and serverless backend (Functions)
+Twilio — SMS messaging and campaign workflows
+Resend — Transactional email delivery
+Cloudflare — DNS management, security, and performance optimization
+Key Features
+End-to-end freight partner recruitment funnel
+Pre-qualification logic to filter candidates before full application
+Multi-step application form with structured data capture
+Automated confirmation and redirect flows
+Disqualification handling with fallback routing
+SMS and email communication integration
+Serverless backend handling form submissions and workflows
+Compliance & Messaging
+Implemented Privacy Policy and Terms of Service for regulatory compliance
+Designed to align with Twilio messaging compliance requirements
+Integrated user consent collection for SMS and contact workflows
+System Architecture
+Static frontend pages served via Netlify
+Serverless functions handle form processing and integrations
+External services (Twilio, Resend) manage communication workflows
+Cloudflare provides security and performance optimization layer
+Current Status
+Live and deployed production system
+Functional application and routing flows
+Twilio campaign submitted for approval
+Codebase actively refined for maintainability and scalability
+Roadmap
+Enhance UI/UX and client-side validation
+Expand compliance and messaging safeguards
+Integrate with internal Lanetool system
+Implement lead tracking and workflow state management
+File Structure
+index.html — Landing page
+prequal.html — Pre-qualification flow
+apply.html — Application form
+thank-you.html — Submission confirmation
+not-a-fit.html — Disqualification page
+privacy-policy.html — Compliance documentation
+terms.html — Messaging terms
+netlify/functions/ — Serverless backend logic
+Author
 
-## Features
-- Landing page for recruiting freight partners
-- Pre-qualification flow
-- Full application form
-- Submission confirmation (thank-you page)
-- Disqualification / redirect flow
-- Privacy Policy and Terms pages for messaging compliance
-- Serverless backend handling via Netlify Functions
-
-## Compliance
-- Privacy Policy and Terms pages are live and accessible
-- Designed to support Twilio messaging compliance requirements
-- SMS and contact consent flows integrated into application process
-
-## Current Status
-- Twilio campaign submitted for review
-- Funnel is live and deployed
-- Forms and redirects are functioning
-- Repository is being cleaned and prepared for professional review
-
-## Next Steps
-- Expand compliance language as needed
-- Improve UI/UX and validation
-- Integrate prequal and application flows into the Lanetool system
-- Add lead tracking and workflow state management
-
-## File Overview
-- `index.html` — main landing page
-- `prequal.html` — prequalification step
-- `apply.html` — full application form
-- `thank-you.html` — confirmation page
-- `not-a-fit.html` — fallback/disqualification page
-- `privacy-policy.html` — compliance page
-- `terms.html` — messaging terms
-- `netlify/functions/` — backend/serverless logic
-
-## Author
 Christopher Wallace
