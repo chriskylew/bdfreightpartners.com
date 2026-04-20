@@ -4,7 +4,8 @@
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const TO_EMAIL = process.env.APPLY_TO_EMAIL || "";
-const FROM_EMAIL = process.env.APPLY_FROM_EMAIL || "BDF Freight <applications@lane-tool.com>";
+const FROM_EMAIL =
+  process.env.APPLY_FROM_EMAIL || "B & D Freight Partners <replies@lane-tool.com>";
 
 function resp(statusCode, obj) {
   return {
@@ -23,6 +24,7 @@ async function verifyTurnstile(token, ip) {
   if (!TURNSTILE_SECRET) {
     return { ok: false, error: "missing_turnstile_secret" };
   }
+
   if (!token) {
     return { ok: false, error: "missing_turnstile_token" };
   }
@@ -46,6 +48,7 @@ async function sendEmail({ subject, text }) {
   if (!RESEND_API_KEY) {
     return { ok: false, error: "missing_resend_api_key" };
   }
+
   if (!TO_EMAIL || !FROM_EMAIL) {
     return { ok: false, error: "email_not_configured" };
   }
@@ -65,11 +68,26 @@ async function sendEmail({ subject, text }) {
   });
 
   const data = await r.json().catch(() => ({}));
+
   if (!r.ok) {
     return { ok: false, error: "resend_failed", detail: data };
   }
 
   return { ok: true, data };
+}
+
+function safe(value) {
+  return value == null ? "" : String(value).trim();
+}
+
+function getClientIp(headers = {}) {
+  const directIp = headers["x-nf-client-connection-ip"];
+  if (directIp) return directIp.trim();
+
+  const forwarded = headers["x-forwarded-for"];
+  if (!forwarded) return "";
+
+  return forwarded.split(",")[0].trim();
 }
 
 exports.handler = async (event) => {
@@ -88,33 +106,33 @@ exports.handler = async (event) => {
     return resp(400, { ok: false, error: "invalid_json" });
   }
 
-  const token = (body["cf-turnstile-response"] || "").trim();
-  const ip =
-    event.headers["x-nf-client-connection-ip"] ||
-    event.headers["x-forwarded-for"] ||
-    "";
+  // Honeypot spam check
+  if (safe(body["bot-field"])) {
+    return resp(400, { ok: false, error: "spam_detected" });
+  }
 
-  // 1) Turnstile verification
-  const v = await verifyTurnstile(token, ip);
-  if (!v.ok) {
+  const token = safe(body["cf-turnstile-response"]);
+  const ip = getClientIp(event.headers || {});
+
+  // Verify Turnstile
+  const verification = await verifyTurnstile(token, ip);
+  if (!verification.ok) {
     return resp(403, {
       ok: false,
       error: "turnstile_failed",
-      detail: v.data || v.error,
+      detail: verification.data || verification.error,
     });
   }
 
-  // 2) Minimal required fields
-  const contact_name = (body.contact_name || "").trim();
-  const phone = (body.phone || "").trim();
+  // Required fields
+  const contact_name = safe(body.contact_name);
+  const phone = safe(body.phone);
 
   if (!contact_name || !phone) {
     return resp(400, { ok: false, error: "missing_required_fields" });
   }
 
-  // 3) Email content
-  const safe = (x) => (x == null ? "" : String(x).trim());
-
+  // Email content
   const subject = `New OO Application: ${contact_name} (${phone})`;
   const text = `New Owner-Operator Application
 
@@ -137,6 +155,7 @@ Time: ${new Date().toISOString()}
 `;
 
   const sent = await sendEmail({ subject, text });
+
   if (!sent.ok) {
     return resp(500, {
       ok: false,
