@@ -4,348 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pre-Qualification | B &amp; D Freight, Inc</title>
-  <meta
-    name="description"
-    content="Fast owner-operator pre-qualification for B &amp; D Freight, Inc. Clear settlement terms explained up front."
-  />
 
-  <!-- Cloudflare Turnstile loader -->
-  <script
-    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-    async
-    defer
-  ></script>
+  <!-- Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <style>
-    :root {
-      --bg: #0b1220;
-      --text: #e9eefc;
-      --muted: #b8c4e6;
-      --card: rgba(255, 255, 255, 0.05);
-      --border: rgba(255, 255, 255, 0.10);
-      --good: #a7f3d0;
-      --bad: #fca5a5;
-      --accent: #7dd3fc;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
+      font-family: Arial, sans-serif;
+      background: #0b1220;
+      color: white;
       margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(180deg, #070b14, var(--bg));
-      color: var(--text);
+      padding: 20px;
     }
 
     .wrap {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    .top a {
-      color: var(--muted);
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .top a:hover,
-    .top a:focus-visible {
-      text-decoration: underline;
-    }
-
-    .hero {
-      margin-top: 8px;
-    }
-
-    h1 {
-      margin: 10px 0 8px;
-      font-size: clamp(26px, 4vw, 34px);
-    }
-
-    p {
-      color: var(--muted);
-      line-height: 1.5;
-      margin: 8px 0;
+      max-width: 800px;
+      margin: auto;
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
+      background: #111827;
+      padding: 20px;
+      border-radius: 12px;
     }
 
     .q {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .q:first-of-type {
-      border-top: 0;
-    }
-
-    .q label {
-      font-weight: 700;
+      margin-bottom: 15px;
     }
 
     select {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-weight: 800;
-      min-width: 140px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 5px;
     }
 
     .btn {
-      appearance: none;
-      border: 0;
-      border-radius: 14px;
-      padding: 14px 16px;
-      font-weight: 900;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn:focus-visible,
-    select:focus-visible {
-      outline: 3px solid rgba(125, 211, 252, 0.45);
-      outline-offset: 2px;
-    }
-
-    .btnPrimary {
-      background: linear-gradient(90deg, var(--accent), var(--good));
-      color: #051018;
       width: 100%;
-    }
-
-    .btnGhost {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
       margin-top: 10px;
     }
 
-    .result {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+    .btnPrimary {
+      background: #4ade80;
+      color: black;
     }
 
-    .hide {
+    .btnGhost {
+      background: #374151;
+      color: white;
+    }
+
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
       display: none;
     }
 
-    a {
-      color: var(--accent);
-    }
+    .pass { background: #064e3b; }
+    .fail { background: #7f1d1d; }
 
-    .note {
-      margin-top: 14px;
+    #tsStatus {
       font-size: 13px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 999px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    @media (max-width: 640px) {
-      .q {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      select {
-        width: 100%;
-      }
+      margin-top: 8px;
+      color: #9ca3af;
     }
   </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <div class="top">
-      <a href="/">← Back</a>
-    </div>
+  <div class="wrap">
 
-    <section class="hero">
-      <span class="badge">Owner-Operator Pre-Qualification</span>
-      <h1>Pre-Qualify in About 60 Seconds</h1>
-      <p>
-        <strong>Clear settlement terms, explained up front.</strong>
-        Please answer accurately to help us evaluate your eligibility.
-      </p>
-    </section>
+    <h1>Pre-Qualify in About 60 Seconds</h1>
 
-    <section class="card">
+    <div class="card">
+
       <div class="q">
-        <label for="q1">Do you have a valid CDL-A?</label>
-        <select id="q1" name="cdl">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+        <label>CDL-A?</label>
+        <select id="q1"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
       <div class="q">
-        <label for="q2">Do you have 2+ years of driving experience?</label>
-        <select id="q2" name="experience">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+        <label>2+ years experience?</label>
+        <select id="q2"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
       <div class="q">
-        <label for="q3">Are you an owner-operator with your own truck?</label>
-        <select id="q3" name="ownerOperator">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+        <label>Owner operator?</label>
+        <select id="q3"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
       <div class="q">
-        <label for="q4">Are you willing to consent to an MVR review?</label>
-        <select id="q4" name="mvrConsent">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+        <label>MVR consent?</label>
+        <select id="q4"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
       <div class="q">
-        <label for="q5">Can you upload CDL and insurance documents?</label>
-        <select id="q5" name="documents">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+        <label>Upload docs?</label>
+        <select id="q5"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
       <div class="q">
-        <label for="q6">Are you available to start within 7–14 days?</label>
-        <select id="q6" name="availability">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+        <label>Start in 7–14 days?</label>
+        <select id="q6"><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
 
-      <div id="tsWrap" style="margin: 12px 0;">
+      <!-- TURNSTILE -->
+      <div style="margin-top:15px;">
         <div
           class="cf-turnstile"
           data-sitekey="0x4AAAAAAACHzcY4o_6jmnTso"
           data-callback="onTurnstileSuccess"
           data-expired-callback="onTurnstileExpire"
           data-error-callback="onTurnstileError"
+          data-appearance="always"
         ></div>
+
+        <div id="tsStatus">Waiting for verification...</div>
       </div>
 
-      <button class="btn btnPrimary" id="checkBtn" type="button">
+      <button id="checkBtn" class="btn btnPrimary" disabled>
         Check Qualification
       </button>
 
-      <a class="btn btnGhost" href="/">Back to Home</a>
+      <a href="/" class="btn btnGhost">Back to Home</a>
 
-      <div id="pass" class="result hide" style="border-color: rgba(167, 243, 208, 0.35);">
-        <strong style="color: var(--good);">Qualified — continue to the application.</strong>
-        <p style="margin: 8px 0 10px;">
-          Next step: complete the owner-operator application form.
-        </p>
-        <p class="note">Redirecting you to the application…</p>
+      <div id="pass" class="result pass">
+        ✅ Qualified — redirecting to application...
       </div>
 
-      <div id="fail" class="result hide" style="border-color: rgba(252, 165, 165, 0.35);">
-        <strong style="color: var(--bad);">Not a fit at this time.</strong>
-        <p style="margin: 8px 0 0;">
-          We partner exclusively with independent owner-operators. We do not hire
-          company drivers or W-2 employees through this application process.
-        </p>
-        <p style="margin: 10px 0 0;">
-          <a href="/not-a-fit.html">See details →</a>
-        </p>
+      <div id="fail" class="result fail">
+        ❌ Not a fit at this time.
       </div>
-    </section>
 
-    <p class="note">
-      Note: Pre-qualification helps us respond faster. Final qualification is confirmed during onboarding.
-    </p>
-
-    <p class="note">
-      By proceeding, you agree that B &amp; D Freight, Inc may contact you regarding your inquiry or application by SMS or email.
-      Message frequency varies. Message and data rates may apply.
-      You may opt out at any time by replying STOP.
-      View our <a href="/terms.html">Terms</a> and <a href="/privacy-policy.html">Privacy Policy</a>.
-    </p>
-  </main>
+    </div>
+  </div>
 
   <script>
-    const qs = ["q1", "q2", "q3", "q4", "q5", "q6"].map((id) =>
-      document.getElementById(id)
-    );
+    const qs = ["q1","q2","q3","q4","q5","q6"].map(id => document.getElementById(id));
     const pass = document.getElementById("pass");
     const fail = document.getElementById("fail");
-    const checkBtn = document.getElementById("checkBtn");
+    const btn = document.getElementById("checkBtn");
+    const tsStatus = document.getElementById("tsStatus");
 
-    let turnstileToken = "";
+    let token = "";
 
-    function setButtonEnabled(enabled) {
-      checkBtn.disabled = !enabled;
-      checkBtn.style.opacity = enabled ? "1" : "0.6";
-      checkBtn.style.cursor = enabled ? "pointer" : "not-allowed";
+    function setEnabled(v){
+      btn.disabled = !v;
+      btn.style.opacity = v ? "1" : "0.5";
     }
 
-    setButtonEnabled(false);
+    setEnabled(false);
 
-    window.onTurnstileSuccess = function (token) {
-      turnstileToken = token || "";
-      setButtonEnabled(true);
+    window.onTurnstileSuccess = (t) => {
+      token = t;
+      tsStatus.innerText = "Verification complete ✅";
+      setEnabled(true);
     };
 
-    window.onTurnstileExpire = function () {
-      turnstileToken = "";
-      setButtonEnabled(false);
+    window.onTurnstileExpire = () => {
+      token = "";
+      tsStatus.innerText = "Verification expired ❌";
+      setEnabled(false);
     };
 
-    window.onTurnstileError = function () {
-      turnstileToken = "";
-      setButtonEnabled(false);
+    window.onTurnstileError = () => {
+      token = "";
+      tsStatus.innerText = "Turnstile failed to load ❌";
+      setEnabled(false);
     };
 
-    checkBtn.addEventListener("click", () => {
-      try {
-        if (!turnstileToken) {
-          alert("Please complete the verification step first.");
-          return;
-        }
-
-        const allYes = qs.every((select) => select.value === "yes");
-
-        pass.classList.toggle("hide", !allYes);
-        fail.classList.toggle("hide", allYes);
-
-        if (allYes) {
-          setTimeout(() => {
-            window.location.href = "/apply";
-          }, 800);
-        }
-      } catch (error) {
-        console.error("Pre-qualification error:", error);
-        alert("Something went wrong. Please try again.");
+    btn.onclick = () => {
+      if(!token){
+        alert("Complete verification first");
+        return;
       }
-    });
+
+      const allYes = qs.every(q => q.value === "yes");
+
+      if(allYes){
+        pass.style.display = "block";
+        fail.style.display = "none";
+        setTimeout(()=> location.href="/apply", 800);
+      } else {
+        fail.style.display = "block";
+        pass.style.display = "none";
+      }
+    };
   </script>
 </body>
 </html>
