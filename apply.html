@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- VERSION: APPLY-NETLIFY-FUNCTION-FIX-2026-04-20-2 -->
+<!-- VERSION: APPLY-NETLIFY-FUNCTION-FIX-2026-04-20-3 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -17,6 +17,8 @@
       --good:#a7f3d0;
       --accent:#7dd3fc;
       --danger:#fca5a5;
+      --input-bg:rgba(255,255,255,.06);
+      --input-border:rgba(255,255,255,.14);
     }
 
     body{
@@ -51,9 +53,9 @@
 
     input, textarea, select{
       width:100%;
-      background:rgba(255,255,255,.06);
+      background:var(--input-bg);
       color:var(--text);
-      border: 1px solid rgba(255,255,255,.14);
+      border: 1px solid var(--input-border);
       border-radius:12px;
       padding:12px;
       font-weight:700;
@@ -67,6 +69,16 @@
       display:block;
       height:46px;
       cursor:pointer;
+      appearance:none;
+      -webkit-appearance:none;
+      -moz-appearance:none;
+      background:var(--input-bg);
+      color:var(--text);
+    }
+
+    select option{
+      background:#0f172a;
+      color:#e9eefc;
     }
 
     .btn{
@@ -131,6 +143,13 @@
       color:var(--good);
       border-color:rgba(167,243,208,.35);
       background:rgba(6,78,59,.18);
+    }
+
+    #tsStatus{
+      font-size:13px;
+      margin:8px 0 0;
+      color:var(--muted);
+      font-weight:700;
     }
   </style>
 
@@ -206,10 +225,17 @@
       <label for="notes">Notes</label>
       <textarea id="notes" name="notes"></textarea>
 
-      <div
-        class="cf-turnstile"
-        data-sitekey="0x4AAAAAACHzcY4o_6jnmTso"
-        data-theme="dark">
+      <div style="margin-top:15px;">
+        <div
+          class="cf-turnstile"
+          data-sitekey="0x4AAAAAADAww3lhW9-k-dU8"
+          data-theme="dark"
+          data-appearance="always"
+          data-callback="onTurnstileSuccess"
+          data-expired-callback="onTurnstileExpire"
+          data-error-callback="onTurnstileError">
+        </div>
+        <div id="tsStatus">Waiting for verification...</div>
       </div>
 
       <button id="submitBtn" class="btn btnPrimary" type="submit">Submit Application →</button>
@@ -236,11 +262,29 @@
   const form = document.getElementById("appForm");
   const submitBtn = document.getElementById("submitBtn");
   const statusMsg = document.getElementById("statusMsg");
+  const tsStatus = document.getElementById("tsStatus");
+
+  let turnstileToken = "";
 
   function showStatus(message, type) {
     statusMsg.textContent = message;
     statusMsg.className = `status ${type}`;
   }
+
+  window.onTurnstileSuccess = (token) => {
+    turnstileToken = token || "";
+    tsStatus.textContent = "Verification complete ✅";
+  };
+
+  window.onTurnstileExpire = () => {
+    turnstileToken = "";
+    tsStatus.textContent = "Verification expired ❌";
+  };
+
+  window.onTurnstileError = () => {
+    turnstileToken = "";
+    tsStatus.textContent = "Turnstile failed to load ❌";
+  };
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -250,8 +294,6 @@
 
     const contactName = form.contact_name.value.trim();
     const phone = form.phone.value.trim();
-    const turnstileToken =
-      form.querySelector('input[name="cf-turnstile-response"]')?.value?.trim() || "";
 
     if (!contactName || !phone) {
       showStatus("Please enter your full name and phone number.", "error");
@@ -291,7 +333,11 @@
 
       if (!response.ok || !result.ok) {
         showStatus("Submission failed. Please try again.", "error");
-        if (window.turnstile) window.turnstile.reset();
+        if (window.turnstile) {
+          window.turnstile.reset();
+          turnstileToken = "";
+          tsStatus.textContent = "Verification reset. Please complete it again.";
+        }
         return;
       }
 
@@ -300,7 +346,11 @@
 
     } catch (error) {
       showStatus("Network error. Please try again.", "error");
-      if (window.turnstile) window.turnstile.reset();
+      if (window.turnstile) {
+        window.turnstile.reset();
+        turnstileToken = "";
+        tsStatus.textContent = "Verification reset. Please complete it again.";
+      }
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit Application →";
