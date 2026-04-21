@@ -1,7 +1,7 @@
 // netlify/functions/apply.js
 // Netlify Function: verify Cloudflare Turnstile, then email the application.
 
-const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET || "";
+const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const TO_EMAIL = process.env.APPLY_TO_EMAIL || "";
 const FROM_EMAIL =
@@ -41,6 +41,7 @@ async function verifyTurnstile(token, ip) {
   });
 
   const data = await r.json().catch(() => ({}));
+
   return { ok: !!data.success, data };
 }
 
@@ -116,7 +117,10 @@ exports.handler = async (event) => {
 
   // Verify Turnstile
   const verification = await verifyTurnstile(token, ip);
+
   if (!verification.ok) {
+    console.log("Turnstile failed:", verification.data || verification.error);
+
     return resp(403, {
       ok: false,
       error: "turnstile_failed",
