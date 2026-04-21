@@ -2,9 +2,6 @@
 /apply    /apply.html    200
 /prequal  /prequal.html  200
 
-# Optional: enforce HTTPS (good practice)
-/*  https://bdfreightpartners.com/:splat  301!
-
 # Optional: handle trailing slashes
 /apply/   /apply.html    200
 /prequal/ /prequal.html  200
