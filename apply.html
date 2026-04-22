@@ -25,11 +25,19 @@
       background: #111827;
       padding: 24px;
       border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
 
     h1 {
       margin-top: 0;
       margin-bottom: 20px;
+    }
+
+    p.intro {
+      color: #cbd5e1;
+      margin-top: -8px;
+      margin-bottom: 24px;
+      line-height: 1.5;
     }
 
     label {
@@ -49,6 +57,15 @@
       background: #0f172a;
       color: white;
       margin-bottom: 16px;
+      font-size: 15px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
     }
 
     textarea {
@@ -74,10 +91,16 @@
       border-radius: 10px;
       border: none;
       font-weight: bold;
+      font-size: 16px;
       background: #4ade80;
       color: black;
       cursor: pointer;
       margin-top: 12px;
+      transition: opacity 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      opacity: 0.95;
     }
 
     button:disabled {
@@ -89,6 +112,7 @@
       margin-top: 14px;
       font-weight: bold;
       min-height: 22px;
+      line-height: 1.4;
     }
 
     #status.error {
@@ -120,6 +144,14 @@
       .row-3 {
         grid-template-columns: 1fr;
       }
+
+      body {
+        padding: 14px;
+      }
+
+      .card {
+        padding: 18px;
+      }
     }
   </style>
 </head>
@@ -127,8 +159,11 @@
   <div class="wrap">
     <div class="card">
       <h1>Application Form</h1>
+      <p class="intro">
+        Complete the form below and our team will review your information.
+      </p>
 
-      <form id="apply-form" action="/thank-you.html" method="GET">
+      <form id="apply-form">
         <label for="name">Full Name</label>
         <input id="name" name="name" type="text" placeholder="Your Full Name" required />
 
@@ -188,10 +223,19 @@
         </div>
 
         <label for="equipment">Equipment Type</label>
-        <input id="equipment" name="equipment" type="text" placeholder="e.g. Power only, Dry van, Reefer" />
+        <input
+          id="equipment"
+          name="equipment"
+          type="text"
+          placeholder="e.g. Power only, Dry van, Reefer"
+        />
 
         <label for="message">Additional Details</label>
-        <textarea id="message" name="message" placeholder="Tell us anything important about your availability, equipment, lanes, or background"></textarea>
+        <textarea
+          id="message"
+          name="message"
+          placeholder="Tell us anything important about your availability, equipment, lanes, or background"
+        ></textarea>
 
         <div class="ts-wrap">
           <div
@@ -205,7 +249,7 @@
 
         <button type="submit">Submit Application →</button>
 
-        <div id="status"></div>
+        <div id="status" aria-live="polite"></div>
       </form>
 
       <a class="back-link" href="/">← Return to Home</a>
@@ -223,6 +267,12 @@
       if (!statusEl) return;
       statusEl.textContent = message;
       statusEl.className = type || "";
+    }
+
+    function setSubmitting(isSubmitting) {
+      if (!btn) return;
+      btn.disabled = isSubmitting;
+      btn.innerText = isSubmitting ? "Submitting..." : "Submit Application →";
     }
 
     function onTurnstileSuccess(t) {
@@ -258,8 +308,7 @@
         const payload = Object.fromEntries(new FormData(form));
         payload["cf-turnstile-response"] = token;
 
-        btn.disabled = true;
-        btn.innerText = "Submitting...";
+        setSubmitting(true);
         showStatus("");
 
         try {
@@ -276,11 +325,10 @@
 
           try {
             data = text ? JSON.parse(text) : {};
-          } catch {
+          } catch (parseError) {
             console.error("Non-JSON response:", text);
             showStatus("Server returned an invalid response.", "error");
-            btn.disabled = false;
-            btn.innerText = "Submit Application →";
+            setSubmitting(false);
             return;
           }
 
@@ -293,19 +341,16 @@
 
             console.error("Submission failed:", data);
             showStatus("Submission failed: " + detail, "error");
-            btn.disabled = false;
-            btn.innerText = "Submit Application →";
+            setSubmitting(false);
             return;
           }
 
           showStatus("Success! Redirecting...", "success");
-
-          form.submit();
+          window.location.href = "/thank-you.html";
         } catch (err) {
           console.error("Network/function error:", err);
           showStatus("Network error. Please try again.", "error");
-          btn.disabled = false;
-          btn.innerText = "Submit Application →";
+          setSubmitting(false);
         }
       });
     }
