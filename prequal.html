@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pre-Qualification | B &amp; D Freight, Inc</title>
 
-  <!-- Turnstile -->
+  <!-- Cloudflare Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <style>
@@ -46,6 +46,7 @@
       border: none;
       font-weight: bold;
       margin-top: 10px;
+      cursor: pointer;
     }
 
     .btnPrimary {
@@ -88,36 +89,54 @@
     <div class="card">
 
       <div class="q">
-        <label>CDL-A?</label>
-        <select id="q1"><option value="yes">Yes</option><option value="no">No</option></select>
+        <label for="q1">CDL-A?</label>
+        <select id="q1">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
 
       <div class="q">
-        <label>2+ years experience?</label>
-        <select id="q2"><option value="yes">Yes</option><option value="no">No</option></select>
+        <label for="q2">2+ years experience?</label>
+        <select id="q2">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
 
       <div class="q">
-        <label>Owner operator?</label>
-        <select id="q3"><option value="yes">Yes</option><option value="no">No</option></select>
+        <label for="q3">Owner operator?</label>
+        <select id="q3">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
 
       <div class="q">
-        <label>MVR consent?</label>
-        <select id="q4"><option value="yes">Yes</option><option value="no">No</option></select>
+        <label for="q4">MVR consent?</label>
+        <select id="q4">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
 
       <div class="q">
-        <label>Upload docs?</label>
-        <select id="q5"><option value="yes">Yes</option><option value="no">No</option></select>
+        <label for="q5">Upload docs?</label>
+        <select id="q5">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
 
       <div class="q">
-        <label>Start in 7–14 days?</label>
-        <select id="q6"><option value="yes">Yes</option><option value="no">No</option></select>
+        <label for="q6">Start in 7–14 days?</label>
+        <select id="q6">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
 
-      <!-- TURNSTILE -->
+      <!-- Turnstile -->
       <div style="margin-top:15px;">
         <div
           class="cf-turnstile"
@@ -125,13 +144,13 @@
           data-callback="onTurnstileSuccess"
           data-expired-callback="onTurnstileExpire"
           data-error-callback="onTurnstileError"
-          data-appearance="always"
-        ></div>
+          data-appearance="always">
+        </div>
 
         <div id="tsStatus">Waiting for verification...</div>
       </div>
 
-      <button id="checkBtn" class="btn btnPrimary" disabled>
+      <button id="checkBtn" class="btn btnPrimary" type="button" disabled>
         Check Qualification
       </button>
 
@@ -157,9 +176,9 @@
 
     let token = "";
 
-    function setEnabled(v){
-      btn.disabled = !v;
-      btn.style.opacity = v ? "1" : "0.5";
+    function setEnabled(enabled){
+      btn.disabled = !enabled;
+      btn.style.opacity = enabled ? "1" : "0.5";
     }
 
     setEnabled(false);
@@ -182,26 +201,29 @@
       setEnabled(false);
     };
 
-    btn.onclick = () => {
-      if(!token){
+    btn.addEventListener("click", () => {
+      if (!token) {
         alert("Complete verification first");
         return;
       }
 
       const allYes = qs.every(q => q.value === "yes");
 
-      if(allYes){
+      if (allYes) {
         pass.style.display = "block";
         fail.style.display = "none";
-        setTimeout(()=> location.href="/apply", 800);
+
+        setTimeout(() => {
+          location.href = "/apply.html"; // IMPORTANT FIX
+        }, 800);
       } else {
         fail.style.display = "block";
         pass.style.display = "none";
       }
-    };
+    });
   </script>
 
-  <!-- DEBUG SCRIPT -->
+  <!-- optional debug -->
   <script src="/debug-submit.js"></script>
 
 </body>
