@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "Freight partner recruiting funnel",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "build": "echo \"No build step\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
