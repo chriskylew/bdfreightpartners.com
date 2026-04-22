@@ -1,44 +1,99 @@
-form.onsubmit = async (e) => {
-  e.preventDefault();
+<script>
+  const form = document.querySelector("#apply-form");
+  const btn = form?.querySelector('button[type="submit"]');
+  const statusEl = document.querySelector("#status");
 
-  if (!token) {
-    showStatus("Please complete the bot check.", "error");
-    return;
+  let token = "";
+
+  function showStatus(message, type = "") {
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.className = type;
   }
 
-  const payload = Object.fromEntries(new FormData(form));
-  payload["cf-turnstile-response"] = token;
+  function onTurnstileSuccess(t) {
+    token = t;
+  }
 
-  btn.disabled = true;
-  btn.innerText = "Submitting...";
+  function onTurnstileExpired() {
+    token = "";
+    showStatus("Bot check expired. Please try again.", "error");
+  }
 
-  try {
-    const res = await fetch("/.netlify/functions/apply", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+  function onTurnstileError() {
+    token = "";
+    showStatus("Bot check failed. Please reload and try again.", "error");
+  }
+
+  if (!form || !btn) {
+    console.error("Form or submit button not found.");
+  } else {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!token) {
+        showStatus("Please complete the bot check.", "error");
+        return;
+      }
+
+      const payload = Object.fromEntries(new FormData(form));
+      payload["cf-turnstile-response"] = token;
+
+      let success = false;
+      btn.disabled = true;
+      btn.innerText = "Submitting...";
+      showStatus("");
+
+      try {
+        const res = await fetch("/.netlify/functions/apply", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let data = {};
+
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch {
+          console.error("Non-JSON response:", text);
+          showStatus("Server returned an invalid response.", "error");
+          return;
+        }
+
+        if (!res.ok || !data.ok) {
+          const detail =
+            data?.error ||
+            data?.detail?.error ||
+            data?.detail?.message ||
+            `Request failed (${res.status})`;
+
+          showStatus("Submission failed: " + detail, "error");
+          return;
+        }
+
+        success = true;
+        showStatus("Success! Redirecting...", "success");
+
+        setTimeout(() => {
+          window.location.href = "/thank-you.html";
+        }, 1000);
+      } catch (err) {
+        console.error(err);
+        showStatus("Network error. Please try again.", "error");
+      } finally {
+        if (!success) {
+          btn.disabled = false;
+          btn.innerText = "Submit Application →";
+        }
+      }
     });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok || !data.ok) {
-      const detail =
-        data?.error ||
-        data?.detail?.error ||
-        data?.detail?.message ||
-        "Unknown error";
-
-      showStatus("Submission failed: " + detail, "error");
-      return;
-    }
-
-    showStatus("Success! Redirecting...", "success");
-    setTimeout(() => location.href = "/thank-you.html", 1000);
-
-  } catch (err) {
-    showStatus("Network error", "error");
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "Submit Application →";
   }
-};
+
+  window.onTurnstileSuccess = onTurnstileSuccess;
+  window.onTurnstileExpired = onTurnstileExpired;
+  window.onTurnstileError = onTurnstileError;
+</script>
