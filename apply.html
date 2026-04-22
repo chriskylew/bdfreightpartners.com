@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Apply | B &amp; D Freight, Inc</title>
 
-  <!-- Turnstile -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <style>
@@ -40,14 +39,21 @@
     }
 
     input,
+    select,
     textarea {
       width: 100%;
+      box-sizing: border-box;
       padding: 12px;
       border-radius: 8px;
       border: 1px solid #374151;
       background: #0f172a;
       color: white;
       margin-bottom: 16px;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
     }
 
     .row {
@@ -71,6 +77,12 @@
       background: #4ade80;
       color: black;
       cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
 
     #status {
@@ -79,8 +91,13 @@
       min-height: 22px;
     }
 
-    #status.error { color: #fca5a5; }
-    #status.success { color: #86efac; }
+    #status.error {
+      color: #fca5a5;
+    }
+
+    #status.success {
+      color: #86efac;
+    }
 
     .back-link {
       display: inline-block;
@@ -93,39 +110,90 @@
       text-decoration: underline;
     }
 
+    .ts-wrap {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
     @media (max-width: 640px) {
-      .row, .row-3 {
+      .row,
+      .row-3 {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
-
 <body>
   <div class="wrap">
     <div class="card">
       <h1>Application Form</h1>
 
-      <form id="apply-form">
-        <label>Full Name</label>
-        <input name="name" required />
+      <form id="apply-form" action="/thank-you.html" method="GET">
+        <label for="name">Full Name</label>
+        <input id="name" name="name" type="text" placeholder="Your Full Name" required />
 
         <div class="row">
-          <input name="email" type="email" placeholder="Email" required />
-          <input name="phone" type="tel" placeholder="Phone" required />
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="Your Email" required />
+          </div>
+
+          <div>
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" placeholder="Your Phone Number" required />
+          </div>
         </div>
 
-        <input name="street" placeholder="Street Address" />
+        <label for="street">Street Address</label>
+        <input id="street" name="street" type="text" placeholder="Street Address" />
 
         <div class="row-3">
-          <input name="city" placeholder="City" required />
-          <input name="state" placeholder="State" required />
-          <input name="zipcode" placeholder="Zip Code" required />
+          <div>
+            <label for="city">City</label>
+            <input id="city" name="city" type="text" placeholder="City" required />
+          </div>
+
+          <div>
+            <label for="state">State</label>
+            <input id="state" name="state" type="text" placeholder="State" maxlength="2" required />
+          </div>
+
+          <div>
+            <label for="zipcode">Zip Code</label>
+            <input id="zipcode" name="zipcode" type="text" placeholder="Zip Code" required />
+          </div>
         </div>
 
-        <textarea name="message" placeholder="Additional details"></textarea>
+        <div class="row">
+          <div>
+            <label for="hasTruck">Do you have a truck?</label>
+            <select id="hasTruck" name="hasTruck" required>
+              <option value="">Select one</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
 
-        <div style="margin:15px 0;">
+          <div>
+            <label for="experience">How many years of experience?</label>
+            <select id="experience" name="experience" required>
+              <option value="">Select one</option>
+              <option value="0-1">0–1 years</option>
+              <option value="1-2">1–2 years</option>
+              <option value="2-3">2–3 years</option>
+              <option value="3-5">3–5 years</option>
+              <option value="5+">5+ years</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="equipment">Equipment Type</label>
+        <input id="equipment" name="equipment" type="text" placeholder="e.g. Power only, Dry van, Reefer" />
+
+        <label for="message">Additional Details</label>
+        <textarea id="message" name="message" placeholder="Tell us anything important about your availability, equipment, lanes, or background"></textarea>
+
+        <div class="ts-wrap">
           <div
             class="cf-turnstile"
             data-sitekey="0x4AAAAAADAww3lhW9-k-dU8"
@@ -146,76 +214,101 @@
 
   <script>
     const form = document.querySelector("#apply-form");
-    const btn = form.querySelector("button");
+    const btn = form?.querySelector('button[type="submit"]');
     const statusEl = document.querySelector("#status");
 
     let token = "";
 
-    function showStatus(msg, type="") {
-      statusEl.textContent = msg;
-      statusEl.className = type;
+    function showStatus(message, type = "") {
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.className = type || "";
     }
 
     function onTurnstileSuccess(t) {
       token = t;
+      showStatus("");
     }
 
     function onTurnstileExpired() {
       token = "";
-      showStatus("Verification expired", "error");
+      showStatus("Bot check expired. Please complete it again.", "error");
     }
 
     function onTurnstileError() {
       token = "";
-      showStatus("Verification failed", "error");
+      showStatus("Bot check failed to load. Please reload and try again.", "error");
     }
 
     window.onTurnstileSuccess = onTurnstileSuccess;
     window.onTurnstileExpired = onTurnstileExpired;
     window.onTurnstileError = onTurnstileError;
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    if (!form || !btn) {
+      console.error("Form or button missing");
+    } else {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-      if (!token) {
-        showStatus("Complete the bot check", "error");
-        return;
-      }
-
-      const payload = Object.fromEntries(new FormData(form));
-      payload["cf-turnstile-response"] = token;
-
-      btn.disabled = true;
-      btn.innerText = "Submitting...";
-
-      try {
-        const res = await fetch("/.netlify/functions/apply", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json().catch(()=>({}));
-
-        if (!res.ok || !data.ok) {
-          showStatus("Submission failed", "error");
-          btn.disabled = false;
-          btn.innerText = "Submit Application →";
+        if (!token) {
+          showStatus("Please complete the bot check.", "error");
           return;
         }
 
-        showStatus("Success! Redirecting...", "success");
+        const payload = Object.fromEntries(new FormData(form));
+        payload["cf-turnstile-response"] = token;
 
-        // 🚀 HARD redirect (this fixes your issue)
-        window.location.href = "/thank-you.html";
+        btn.disabled = true;
+        btn.innerText = "Submitting...";
+        showStatus("");
 
-      } catch {
-        showStatus("Network error", "error");
-        btn.disabled = false;
-        btn.innerText = "Submit Application →";
-      }
-    });
+        try {
+          const res = await fetch("/.netlify/functions/apply", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const text = await res.text();
+          let data = {};
+
+          try {
+            data = text ? JSON.parse(text) : {};
+          } catch {
+            console.error("Non-JSON response:", text);
+            showStatus("Server returned an invalid response.", "error");
+            btn.disabled = false;
+            btn.innerText = "Submit Application →";
+            return;
+          }
+
+          if (!res.ok || !data.ok) {
+            const detail =
+              data?.error ||
+              data?.detail?.error ||
+              data?.detail?.message ||
+              `Error ${res.status}`;
+
+            console.error("Submission failed:", data);
+            showStatus("Submission failed: " + detail, "error");
+            btn.disabled = false;
+            btn.innerText = "Submit Application →";
+            return;
+          }
+
+          showStatus("Success! Redirecting...", "success");
+
+          form.submit();
+        } catch (err) {
+          console.error("Network/function error:", err);
+          showStatus("Network error. Please try again.", "error");
+          btn.disabled = false;
+          btn.innerText = "Submit Application →";
+        }
+      });
+    }
   </script>
-
 </body>
 </html>
