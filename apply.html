@@ -194,7 +194,7 @@
         <div id="status"></div>
       </form>
 
-      <a class="back-link" href="/prequal.html">← Back to Pre-Qualification</a>
+      <a class="back-link" href="/">← Return to Home</a>
     </div>
   </div>
 
@@ -283,8 +283,11 @@
           }
 
           success = true;
-          alert("Success block ran");
-          window.location.href = "/thank-you.html";
+          showStatus("Success! Redirecting...", "success");
+
+          setTimeout(() => {
+            window.location.replace("/thank-you.html");
+          }, 100);
         } catch (err) {
           console.error("Network/function error:", err);
           showStatus("Network error. Please try again.", "error");
