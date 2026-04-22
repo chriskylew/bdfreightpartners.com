@@ -1,99 +1,144 @@
-<script>
-  const form = document.querySelector("#apply-form");
-  const btn = form?.querySelector('button[type="submit"]');
-  const statusEl = document.querySelector("#status");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply</title>
 
-  let token = "";
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-  function showStatus(message, type = "") {
-    if (!statusEl) return;
-    statusEl.textContent = message;
-    statusEl.className = type;
-  }
+  <style>
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    #status.error { color: red; }
+    #status.success { color: green; }
+  </style>
+</head>
+<body>
 
-  function onTurnstileSuccess(t) {
-    token = t;
-  }
+  <h1>Application Form</h1>
 
-  function onTurnstileExpired() {
-    token = "";
-    showStatus("Bot check expired. Please try again.", "error");
-  }
+  <form id="apply-form">
+    <input name="name" placeholder="Your Name" required /><br><br>
+    <input name="email" type="email" placeholder="Your Email" required /><br><br>
+    <textarea name="message" placeholder="Your Message" required></textarea><br><br>
 
-  function onTurnstileError() {
-    token = "";
-    showStatus("Bot check failed. Please reload and try again.", "error");
-  }
+    <!-- Turnstile widget -->
+    <div
+      class="cf-turnstile"
+      data-sitekey="YOUR_SITE_KEY"
+      data-callback="onTurnstileSuccess"
+      data-expired-callback="onTurnstileExpired"
+      data-error-callback="onTurnstileError">
+    </div>
 
-  if (!form || !btn) {
-    console.error("Form or submit button not found.");
-  } else {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    <br>
 
-      if (!token) {
-        showStatus("Please complete the bot check.", "error");
-        return;
-      }
+    <button type="submit">Submit Application →</button>
 
-      const payload = Object.fromEntries(new FormData(form));
-      payload["cf-turnstile-response"] = token;
+    <div id="status"></div>
+  </form>
 
-      let success = false;
-      btn.disabled = true;
-      btn.innerText = "Submitting...";
-      showStatus("");
+  <script>
+    const form = document.querySelector("#apply-form");
+    const btn = form?.querySelector('button[type="submit"]');
+    const statusEl = document.querySelector("#status");
 
-      try {
-        const res = await fetch("/.netlify/functions/apply", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
+    let token = "";
 
-        const text = await res.text();
-        let data = {};
+    function showStatus(message, type = "") {
+      if (!statusEl) return;
+      statusEl.textContent = message;
+      statusEl.className = type;
+    }
+
+    function onTurnstileSuccess(t) {
+      token = t;
+    }
+
+    function onTurnstileExpired() {
+      token = "";
+      showStatus("Bot check expired. Please try again.", "error");
+    }
+
+    function onTurnstileError() {
+      token = "";
+      showStatus("Bot check failed. Please reload and try again.", "error");
+    }
+
+    window.onTurnstileSuccess = onTurnstileSuccess;
+    window.onTurnstileExpired = onTurnstileExpired;
+    window.onTurnstileError = onTurnstileError;
+
+    if (!form || !btn) {
+      console.error("Form or button missing");
+    } else {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!token) {
+          showStatus("Please complete the bot check.", "error");
+          return;
+        }
+
+        const payload = Object.fromEntries(new FormData(form));
+        payload["cf-turnstile-response"] = token;
+
+        let success = false;
+        btn.disabled = true;
+        btn.innerText = "Submitting...";
+        showStatus("");
 
         try {
-          data = text ? JSON.parse(text) : {};
-        } catch {
-          console.error("Non-JSON response:", text);
-          showStatus("Server returned an invalid response.", "error");
-          return;
+          const res = await fetch("/.netlify/functions/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const text = await res.text();
+          let data = {};
+
+          try {
+            data = text ? JSON.parse(text) : {};
+          } catch {
+            showStatus("Server returned invalid response.", "error");
+            return;
+          }
+
+          if (!res.ok || !data.ok) {
+            const detail =
+              data?.error ||
+              data?.detail?.error ||
+              data?.detail?.message ||
+              `Error ${res.status}`;
+
+            showStatus("Submission failed: " + detail, "error");
+            return;
+          }
+
+          success = true;
+          showStatus("Success! Redirecting...", "success");
+
+          setTimeout(() => {
+            window.location.href = "/thank-you.html";
+          }, 1000);
+
+        } catch (err) {
+          console.error(err);
+          showStatus("Network error. Try again.", "error");
+        } finally {
+          if (!success) {
+            btn.disabled = false;
+            btn.innerText = "Submit Application →";
+          }
         }
+      });
+    }
+  </script>
 
-        if (!res.ok || !data.ok) {
-          const detail =
-            data?.error ||
-            data?.detail?.error ||
-            data?.detail?.message ||
-            `Request failed (${res.status})`;
-
-          showStatus("Submission failed: " + detail, "error");
-          return;
-        }
-
-        success = true;
-        showStatus("Success! Redirecting...", "success");
-
-        setTimeout(() => {
-          window.location.href = "/thank-you.html";
-        }, 1000);
-      } catch (err) {
-        console.error(err);
-        showStatus("Network error. Please try again.", "error");
-      } finally {
-        if (!success) {
-          btn.disabled = false;
-          btn.innerText = "Submit Application →";
-        }
-      }
-    });
-  }
-
-  window.onTurnstileSuccess = onTurnstileSuccess;
-  window.onTurnstileExpired = onTurnstileExpired;
-  window.onTurnstileError = onTurnstileError;
-</script>
+</body>
+</html>
