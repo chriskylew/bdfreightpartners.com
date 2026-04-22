@@ -1,205 +1,7 @@
-<!doctype html>
-<!-- VERSION: APPLY-FIX-DEBUG-2026 -->
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Apply — B &amp; D Freight Partners</title>
-
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
-  <style>
-    body {
-      margin:0;
-      font-family: Arial, sans-serif;
-      background:#061126;
-      color:white;
-      padding:20px;
-    }
-
-    .wrap{ max-width:900px; margin:auto; }
-
-    .card{
-      background:#111827;
-      padding:20px;
-      border-radius:12px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    @media (max-width:760px){
-      .grid{ grid-template-columns:1fr; }
-    }
-
-    label{ font-weight:bold; display:block; margin-top:12px; }
-
-    input, textarea, select{
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      margin-top:5px;
-      background:#0f172a;
-      color:white;
-      border:1px solid #334155;
-    }
-
-    select option{
-      background:#0f172a;
-      color:white;
-    }
-
-    textarea{ min-height:100px; }
-
-    .btn{
-      width:100%;
-      padding:14px;
-      border-radius:10px;
-      border:none;
-      font-weight:bold;
-      margin-top:12px;
-    }
-
-    .btnPrimary{ background:#4ade80; color:black; }
-    .btnGhost{ background:#374151; color:white; text-decoration:none; display:block; text-align:center; }
-
-    .status{
-      margin-top:12px;
-      padding:12px;
-      border-radius:10px;
-      display:none;
-      font-weight:bold;
-    }
-
-    .error{ background:#7f1d1d; }
-    .success{ background:#064e3b; }
-
-    #tsStatus{
-      font-size:13px;
-      margin-top:8px;
-      color:#9ca3af;
-    }
-  </style>
-</head>
-
-<body>
-<div class="wrap">
-
-<h1>Owner-Operator Application</h1>
-<p>Fast intake. If qualified, we’ll review your application and reach out directly.</p>
-
-<div class="card">
-<form id="appForm">
-
-  <div class="grid">
-    <div>
-      <label>Full Name *</label>
-      <input name="contact_name" required>
-    </div>
-
-    <div>
-      <label>Phone *</label>
-      <input name="phone" required>
-    </div>
-
-    <div>
-      <label>Email</label>
-      <input name="email">
-    </div>
-
-    <div>
-      <label>Home ZIP</label>
-      <input name="home_zip">
-    </div>
-
-    <div>
-      <label>Equipment Type</label>
-      <select name="equipment_type">
-        <option value="">— choose —</option>
-        <option>Dry Van</option>
-        <option>Reefer</option>
-        <option>Flatbed</option>
-        <option>Power Only</option>
-      </select>
-    </div>
-
-    <div>
-      <label># of Trucks</label>
-      <select name="truck_count">
-        <option value="">— choose —</option>
-        <option>1</option>
-        <option>2–3</option>
-        <option>4–10</option>
-        <option>10+</option>
-      </select>
-    </div>
-  </div>
-
-  <label>Preferred Regions</label>
-  <textarea name="preferred_regions"></textarea>
-
-  <label>Notes</label>
-  <textarea name="notes"></textarea>
-
-  <!-- TURNSTILE -->
-  <div style="margin-top:15px;">
-    <div
-      class="cf-turnstile"
-      data-sitekey="0x4AAAAAADAww3lhW9-k-dU8"
-      data-callback="onTurnstileSuccess"
-      data-expired-callback="onTurnstileExpire"
-      data-error-callback="onTurnstileError"
-      data-appearance="always"
-    ></div>
-
-    <div id="tsStatus">Waiting for verification...</div>
-  </div>
-
-  <button id="submitBtn" class="btn btnPrimary">Submit Application →</button>
-  <a href="/" class="btn btnGhost">Back to Home</a>
-
-  <div id="statusMsg" class="status"></div>
-
-</form>
-</div>
-</div>
-
-<script>
-const form = document.getElementById("appForm");
-const btn = document.getElementById("submitBtn");
-const statusMsg = document.getElementById("statusMsg");
-const tsStatus = document.getElementById("tsStatus");
-
-let token = "";
-
-function showStatus(msg, type){
-  statusMsg.innerText = msg;
-  statusMsg.className = "status " + type;
-  statusMsg.style.display = "block";
-}
-
-window.onTurnstileSuccess = (t)=>{
-  token = t;
-  tsStatus.innerText = "Verification complete ✅";
-};
-
-window.onTurnstileExpire = ()=>{
-  token = "";
-  tsStatus.innerText = "Verification expired ❌";
-};
-
-window.onTurnstileError = ()=>{
-  token = "";
-  tsStatus.innerText = "Turnstile failed ❌";
-};
-
-form.onsubmit = async (e)=>{
+form.onsubmit = async (e) => {
   e.preventDefault();
 
-  if(!token){
+  if (!token) {
     showStatus("Please complete the bot check.", "error");
     return;
   }
@@ -210,16 +12,16 @@ form.onsubmit = async (e)=>{
   btn.disabled = true;
   btn.innerText = "Submitting...";
 
-  try{
-    const res = await fetch("/.netlify/functions/apply",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
+  try {
+    const res = await fetch("/.netlify/functions/apply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
-    const data = await res.json().catch(()=>({}));
+    const data = await res.json().catch(() => ({}));
 
-    if(!res.ok || !data.ok){
+    if (!res.ok || !data.ok) {
       const detail =
         data?.error ||
         data?.detail?.error ||
@@ -231,19 +33,12 @@ form.onsubmit = async (e)=>{
     }
 
     showStatus("Success! Redirecting...", "success");
-    setTimeout(()=> location.href="/thank-you.html",1000);
+    setTimeout(() => location.href = "/thank-you.html", 1000);
 
-  }catch(err){
+  } catch (err) {
     showStatus("Network error", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Submit Application →";
   }
-
-  btn.disabled = false;
-  btn.innerText = "Submit Application →";
 };
-</script>
-
-<!-- ✅ DEBUG SCRIPT (CORRECT LOCATION) -->
-<script src="/debug-submit.js"></script>
-
-</body>
-</html>
