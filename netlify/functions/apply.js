@@ -4,6 +4,9 @@ exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         ok: false,
         error: "Method not allowed",
@@ -18,6 +21,9 @@ exports.handler = async (event) => {
     if (!supabaseUrl || !supabaseKey) {
       return {
         statusCode: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           ok: false,
           error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
@@ -27,7 +33,21 @@ exports.handler = async (event) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const body = JSON.parse(event.body || "{}");
+    let body = {};
+    try {
+      body = JSON.parse(event.body || "{}");
+    } catch (parseError) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ok: false,
+          error: "Invalid JSON body",
+        }),
+      };
+    }
 
     const {
       name,
@@ -46,6 +66,9 @@ exports.handler = async (event) => {
     if (!name || !email || !phone || !city || !state || !zipcode) {
       return {
         statusCode: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           ok: false,
           error: "Missing required fields",
@@ -81,16 +104,21 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           ok: false,
           error: error.message || "Database insert failed",
-          detail: error,
         }),
       };
     }
 
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         ok: true,
         message: "Application submitted successfully",
@@ -102,6 +130,9 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         ok: false,
         error: err.message || "Server error",
