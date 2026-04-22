@@ -110,7 +110,7 @@
 
       <form id="apply-form">
         <label for="name">Full Name</label>
-        <input id="name" name="name" placeholder="Your Name" required />
+        <input id="name" name="name" type="text" placeholder="Your Name" required />
 
         <label for="email">Email</label>
         <input id="email" name="email" type="email" placeholder="Your Email" required />
@@ -147,7 +147,7 @@
     function showStatus(message, type = "") {
       if (!statusEl) return;
       statusEl.textContent = message;
-      statusEl.className = type ? type : "";
+      statusEl.className = type || "";
     }
 
     function onTurnstileSuccess(t) {
