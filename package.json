@@ -1,0 +1,12 @@
+{
+  "name": "bdfreightpartners",
+  "version": "1.0.0",
+  "description": "Freight partner recruiting funnel",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo \"No build step\""
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0"
+  }
+}
