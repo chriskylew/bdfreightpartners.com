@@ -283,11 +283,8 @@
           }
 
           success = true;
-          showStatus("Success! Redirecting...", "success");
-
-          setTimeout(() => {
-            window.location.href = "/thank-you.html";
-          }, 1000);
+          alert("Success block ran");
+          window.location.href = "/thank-you.html";
         } catch (err) {
           console.error("Network/function error:", err);
           showStatus("Network error. Please try again.", "error");
