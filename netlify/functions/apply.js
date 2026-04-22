@@ -1,95 +1,97 @@
-exports.handler = async (event) => {
-  try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ok: false, error: "Method not allowed" })
-      };
-    }
+const { createClient } = require("@supabase/supabase-js");
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+exports.handler = async (event) => {
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ ok: false, error: "Method not allowed" }),
+    };
+  }
+
+  try {
     const body = JSON.parse(event.body || "{}");
 
-    console.log("Incoming submission:", body);
+    const {
+      name,
+      email,
+      phone,
+      street,
+      city,
+      state,
+      zipcode,
+      hasTruck,
+      experience,
+      equipment,
+      message,
+    } = body;
 
-    const token = body["cf-turnstile-response"];
-    if (!token) {
+    if (!name || !email || !phone || !city || !state || !zipcode) {
       return {
         statusCode: 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ok: false, error: "Missing Turnstile token" })
+        body: JSON.stringify({
+          ok: false,
+          error: "Missing required fields",
+        }),
       };
     }
 
-    const secret = process.env.TURNSTILE_SECRET_KEY;
-    if (!secret) {
+    const has_truck =
+      hasTruck === "yes" ? true : hasTruck === "no" ? false : null;
+
+    const { data, error } = await supabase
+      .from("applications")
+      .insert([
+        {
+          name: String(name).trim(),
+          email: String(email).trim().toLowerCase(),
+          phone: String(phone).trim(),
+          street: street ? String(street).trim() : null,
+          city: String(city).trim(),
+          state: String(state).trim().toUpperCase(),
+          zipcode: String(zipcode).trim(),
+          has_truck,
+          experience: experience ? String(experience).trim() : null,
+          equipment: equipment ? String(equipment).trim() : null,
+          message: message ? String(message).trim() : null,
+          status: "new",
+        },
+      ])
+      .select();
+
+    if (error) {
+      console.error("Supabase insert error:", error);
+
       return {
         statusCode: 500,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ok: false, error: "Missing server secret" })
-      };
-    }
-
-    const forwardedFor =
-      event.headers?.["x-forwarded-for"] ||
-      event.headers?.["client-ip"] ||
-      "";
-
-    const ip = forwardedFor.split(",")[0].trim();
-
-    const verifyRes = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-          secret,
-          response: token,
-          remoteip: ip
-        }).toString()
-      }
-    );
-
-    let verifyData = {};
-    try {
-      verifyData = await verifyRes.json();
-    } catch {
-      return {
-        statusCode: 502,
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ok: false,
-          error: "Invalid response from Turnstile verification"
-        })
-      };
-    }
-
-    if (!verifyRes.ok || !verifyData.success) {
-      return {
-        statusCode: 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ok: false,
-          error: "Bot verification failed",
-          detail: verifyData
-        })
+          error: error.message || "Database insert failed",
+        }),
       };
     }
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: true })
+      body: JSON.stringify({
+        ok: true,
+        message: "Application submitted successfully",
+        data,
+      }),
     };
   } catch (err) {
     console.error("Function error:", err);
 
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, error: "Server error" })
+      body: JSON.stringify({
+        ok: false,
+        error: err.message || "Server error",
+      }),
     };
   }
 };
