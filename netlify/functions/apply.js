@@ -1,172 +1,99 @@
-// netlify/functions/apply.js
-// Netlify Function: verify Cloudflare Turnstile, then email the application.
+(function () {
+  const DEBUG_ENABLED =
+    window.location.search.includes("debug=1") ||
+    localStorage.getItem("debugSubmit") === "1";
 
-const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || "";
-const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const TO_EMAIL = process.env.APPLY_TO_EMAIL || "";
-const FROM_EMAIL =
-  process.env.APPLY_FROM_EMAIL || "B & D Freight Partners <replies@lane-tool.com>";
+  if (!DEBUG_ENABLED) return;
 
-function resp(statusCode, obj) {
-  return {
-    statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-    },
-    body: JSON.stringify(obj),
+  const state = {
+    startedAt: new Date().toISOString(),
+    logs: [],
   };
-}
 
-async function verifyTurnstile(token, ip) {
-  if (!TURNSTILE_SECRET) {
-    return { ok: false, error: "missing_turnstile_secret" };
+  function log(type, message, data) {
+    const entry = {
+      time: new Date().toISOString(),
+      type,
+      message,
+      data: data || null,
+    };
+    state.logs.push(entry);
+
+    const method =
+      type === "error" ? "error" :
+      type === "warn" ? "warn" :
+      "log";
+
+    console[method]("[DEBUG-SUBMIT]", message, data || "");
+
+    const box = document.getElementById("debug-submit-box");
+    if (box) {
+      const row = document.createElement("div");
+      row.style.borderBottom = "1px solid rgba(255,255,255,0.12)";
+      row.style.padding = "6px 0";
+      row.innerHTML =
+        "<div><strong>" + escapeHtml(type.toUpperCase()) + "</strong> " +
+        escapeHtml(message) + "</div>" +
+        (data ? "<pre style='white-space:pre-wrap;margin:4px 0 0;'>" +
+          escapeHtml(safeStringify(data)) +
+          "</pre>" : "");
+      box.prepend(row);
+    }
   }
 
-  if (!token) {
-    return { ok: false, error: "missing_turnstile_token" };
+  function safeStringify(value) {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch (e) {
+      return String(value);
+    }
   }
 
-  const form = new URLSearchParams();
-  form.append("secret", TURNSTILE_SECRET);
-  form.append("response", token);
-  if (ip) form.append("remoteip", ip);
-
-  const r = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: form.toString(),
-  });
-
-  const data = await r.json().catch(() => ({}));
-
-  return { ok: !!data.success, data };
-}
-
-async function sendEmail({ subject, text }) {
-  if (!RESEND_API_KEY) {
-    return { ok: false, error: "missing_resend_api_key" };
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
-  if (!TO_EMAIL || !FROM_EMAIL) {
-    return { ok: false, error: "email_not_configured" };
-  }
+  function addPanel() {
+    const wrap = document.createElement("div");
+    wrap.id = "debug-submit-wrap";
+    wrap.style.position = "fixed";
+    wrap.style.right = "12px";
+    wrap.style.bottom = "12px";
+    wrap.style.width = "420px";
+    wrap.style.maxWidth = "95vw";
+    wrap.style.maxHeight = "60vh";
+    wrap.style.background = "#111";
+    wrap.style.color = "#fff";
+    wrap.style.zIndex = "999999";
+    wrap.style.fontSize = "12px";
+    wrap.style.fontFamily = "monospace";
+    wrap.style.border = "1px solid rgba(255,255,255,0.2)";
+    wrap.style.borderRadius = "10px";
+    wrap.style.boxShadow = "0 10px 30px rgba(0,0,0,0.35)";
+    wrap.style.overflow = "hidden";
 
-  const r = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: FROM_EMAIL,
-      to: [TO_EMAIL],
-      subject,
-      text,
-    }),
-  });
+    wrap.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#1b1b1b;border-bottom:1px solid rgba(255,255,255,0.12);">
+        <strong>Submit Debug</strong>
+        <div style="display:flex;gap:8px;">
+          <button id="debug-copy-btn" style="cursor:pointer;">Copy Logs</button>
+          <button id="debug-clear-btn" style="cursor:pointer;">Clear</button>
+          <button id="debug-close-btn" style="cursor:pointer;">Close</button>
+        </div>
+      </div>
+      <div id="debug-submit-box" style="padding:10px;overflow:auto;max-height:50vh;"></div>
+    `;
+    document.body.appendChild(wrap);
 
-  const data = await r.json().catch(() => ({}));
-
-  if (!r.ok) {
-    return { ok: false, error: "resend_failed", detail: data };
-  }
-
-  return { ok: true, data };
-}
-
-function safe(value) {
-  return value == null ? "" : String(value).trim();
-}
-
-function getClientIp(headers = {}) {
-  const directIp = headers["x-nf-client-connection-ip"];
-  if (directIp) return directIp.trim();
-
-  const forwarded = headers["x-forwarded-for"];
-  if (!forwarded) return "";
-
-  return forwarded.split(",")[0].trim();
-}
-
-exports.handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") {
-    return resp(200, { ok: true });
-  }
-
-  if (event.httpMethod !== "POST") {
-    return resp(405, { ok: false, error: "method_not_allowed" });
-  }
-
-  let body = {};
-  try {
-    body = JSON.parse(event.body || "{}");
-  } catch {
-    return resp(400, { ok: false, error: "invalid_json" });
-  }
-
-  // Honeypot spam check
-  if (safe(body["bot-field"])) {
-    return resp(400, { ok: false, error: "spam_detected" });
-  }
-
-  const token = safe(body["cf-turnstile-response"]);
-  const ip = getClientIp(event.headers || {});
-
-  // Verify Turnstile
-  const verification = await verifyTurnstile(token, ip);
-
-  if (!verification.ok) {
-    console.log("Turnstile failed:", verification.data || verification.error);
-
-    return resp(403, {
-      ok: false,
-      error: "turnstile_failed",
-      detail: verification.data || verification.error,
-    });
-  }
-
-  // Required fields
-  const contact_name = safe(body.contact_name);
-  const phone = safe(body.phone);
-
-  if (!contact_name || !phone) {
-    return resp(400, { ok: false, error: "missing_required_fields" });
-  }
-
-  // Email content
-  const subject = `New OO Application: ${contact_name} (${phone})`;
-  const text = `New Owner-Operator Application
-
-Name: ${contact_name}
-Phone: ${phone}
-Email: ${safe(body.email) || "(blank)"}
-Home ZIP: ${safe(body.home_zip) || "(blank)"}
-
-Equipment: ${safe(body.equipment_type) || "(blank)"}
-Trucks: ${safe(body.truck_count) || "(blank)"}
-
-Preferred Regions/Lanes:
-${safe(body.preferred_regions) || "(blank)"}
-
-Notes:
-${safe(body.notes) || "(blank)"}
-
-IP: ${ip || "(unknown)"}
-Time: ${new Date().toISOString()}
-`;
-
-  const sent = await sendEmail({ subject, text });
-
-  if (!sent.ok) {
-    return resp(500, {
-      ok: false,
-      error: sent.error,
-      detail: sent.detail || null,
-    });
-  }
-
-  return resp(200, { ok: true });
-};
+    document.getElementById("debug-copy-btn").addEventListener("click", async function () {
+      const text = safeStringify(state.logs);
+      try {
+        await navigator.clipboard.writeText(text);
+        log("info", "Logs copied to clipboard");
+      } catch (e) {
+        log
