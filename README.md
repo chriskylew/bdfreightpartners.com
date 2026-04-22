@@ -8,6 +8,10 @@ The system captures, filters, and routes candidate data while supporting scalabl
 
 ---
 
+## Live Demo
+
+👉 https://bdfreightpartners.com
+
 ## Tech Stack
 
 * **Netlify** — Hosting and serverless backend (Functions)
