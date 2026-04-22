@@ -30,26 +30,43 @@ exports.handler = async (event) => {
       };
     }
 
-    const ip =
-      event.headers["x-forwarded-for"] ||
-      event.headers["client-ip"] ||
+    const forwardedFor =
+      event.headers?.["x-forwarded-for"] ||
+      event.headers?.["client-ip"] ||
       "";
 
-    const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({
-        secret,
-        response: token,
-        remoteip: ip
-      }).toString()
-    });
+    const ip = forwardedFor.split(",")[0].trim();
 
-    const verifyData = await verifyRes.json();
+    const verifyRes = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          secret,
+          response: token,
+          remoteip: ip
+        }).toString()
+      }
+    );
 
-    if (!verifyData.success) {
+    let verifyData = {};
+    try {
+      verifyData = await verifyRes.json();
+    } catch {
+      return {
+        statusCode: 502,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ok: false,
+          error: "Invalid response from Turnstile verification"
+        })
+      };
+    }
+
+    if (!verifyRes.ok || !verifyData.success) {
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },
