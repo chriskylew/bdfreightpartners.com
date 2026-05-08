@@ -1,7 +1,3 @@
-# Clean URL rewrites
-/apply    /apply.html    200
-/prequal  /prequal.html  200
-
-# Optional: handle trailing slashes
-/apply/   /apply.html    200
-/prequal/ /prequal.html  200
+/privacy-policy /privacy-policy.html 200
+/terms /terms.html 200
+/terms-and-conditions /terms.html 200
