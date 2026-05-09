@@ -3,6 +3,13 @@
 Small Twilio A2P-verifiable static site for B&D Freight Partners.
 
 ## Production Site
+## Stack
+
+- Cloudflare Pages
+- Cloudflare DNS
+- Twilio A2P Verification
+- Static HTML/CSS
+
 
 https://bdfreightpartner.com
 
